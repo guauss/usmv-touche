@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171719">
+  <meta name="description" content="USMV touché : constituez et partagez des équipes équilibrées avec la synchronisation sécurisée Supabase.">
+  <title>USMV touché - Gestion de l'effectif</title>
+  <style>
+    :root {
+      --ink:#171719; --ink-light:#97152b; --forest:#171719; --forest2:#97152b;
+      --lime:#ffe4e8; --lime-deep:#dc3b54; --cream:#f5f6f1; --paper:#ffffff;
+      --line:#dfe7de; --soft:#edf2ea; --muted:#7e8c82; --orange:#ffe4e8;
+      --shadow:0 14px 48px rgba(26,64,46,.075); --radius:19px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0; min-width:320px; font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:var(--cream); color:var(--ink); -webkit-font-smoothing:antialiased}
+    button,input,select{font:inherit}
+    button{cursor:pointer}button:disabled{opacity:.48;cursor:not-allowed}
+    button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #dc3b54;outline-offset:3px}
+    a{color:inherit;text-decoration:none} svg{display:block;flex-shrink:0}
+    .page{max-width:1510px;margin:auto;padding:0 34px 70px}
+    .topbar{height:92px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .brand{display:flex;align-items:center;gap:12px;white-space:nowrap}
+    .brandmark{height:40px;width:40px;border-radius:13px;background:var(--forest);display:grid;place-items:center;color:var(--lime)}
+    .brandtext{font-weight:900;font-size:17px;letter-spacing:-.6px;line-height:1.13}
+    .brandtext span{display:block;font-size:10px;letter-spacing:2.7px;font-weight:800;color:#76867d;margin-top:3px}
+    .topnav{display:flex;align-items:center;gap:27px;margin-left:auto}
+    .topnav a{font-size:13px;color:#97152b;font-weight:700;transition:color .2s}
+    .topnav a:hover{color:#171719}
+    .privacy{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:40px;padding:10px 13px;color:#97152b;font-size:11px;font-weight:800;white-space:nowrap}
+    .pulse-dot{width:7px;height:7px;background:#b91c35;border-radius:100%}
+    .hero{min-height:310px;display:flex;position:relative;overflow:hidden;border-radius:25px;background:linear-gradient(110deg,#171719 10%,#97152b 72%,#97152b); color:#fff;padding:41px 46px;margin-bottom:20px}
+    .hero-main{z-index:2;max-width:710px;display:flex;flex-direction:column;align-items:flex-start}
+    .eyebrow{color:#ffe4e8;font-weight:900;text-transform:uppercase;letter-spacing:2.9px;font-size:10px;display:flex;align-items:center;gap:10px}
+    .eyebrow:before{content:"";width:21px;height:2px;background:var(--lime)}
+    h1{font-size:clamp(34px,4.3vw,57px);font-weight:900;line-height:1.1;letter-spacing:-2.6px;margin:20px 0 14px}
+    h1 em{color:var(--lime);font-style:normal}
+    .hero p{margin:0;max-width:515px;color:#d5e0d7;font-size:14px;line-height:1.7}
+    .hero-actions{display:flex;gap:11px;align-items:center;flex-wrap:wrap;margin-top:24px}
+    .btn{border:0;border-radius:11px;padding:12px 17px;display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:850;font-size:12px;line-height:1.2;transition:transform .16s,background .16s,box-shadow .16s;white-space:nowrap}
+    .btn:not(:disabled):hover{transform:translateY(-1px)}
+    .btn-lime{background:var(--lime);color:#171719;box-shadow:0 5px 15px rgba(0,0,0,.13)}
+    .btn-lime:hover{background:#ffe4e8}
+    .btn-ghost{background:#ffffff13;border:1px solid #ffffff4a;color:#f8fff9}
+    .btn-solid{background:var(--forest);color:#fff}
+    .btn-solid:hover{background:#97152b}
+    .btn-soft{background:#eff3eb;color:#97152b;border:1px solid #e0e8dc}
+    .btn-outline{background:#fff;border:1px solid #d7e2d7;color:#97152b}
+    .btn-small{padding:9px 12px;font-size:11px;border-radius:9px}
+    .hero-art{position:absolute;top:-70px;bottom:-80px;right:-16px;width:47%;opacity:.97;pointer-events:none;overflow:hidden}
+    .pitch{width:540px;height:540px;position:absolute;right:-40px;top:-90px;border:1px solid #77bb797a;border-radius:50%;transform:rotate(-22deg)}
+    .pitch:before{content:"";position:absolute;inset:62px;border:1px solid #94c28a50;border-radius:50%}
+    .pitch:after{content:"";position:absolute;inset:137px;border:1px solid #94c28a40;border-radius:50%}
+    .hero-ring{position:absolute;width:500px;height:1px;background:#ffffff21;top:52%;left:5%;transform:rotate(-33deg)}
+    .hero-ball{position:absolute;right:90px;top:86px;width:235px;height:150px;border:3px solid #eeeef0;border-radius:55% 45% 55% 45% / 50% 53% 47% 50%;transform:rotate(-32deg);background:linear-gradient(155deg,#d5ef9f22,#9bc66a06);box-shadow:0 0 0 13px #ffffff06,0 0 70px #0b251e66}
+    .hero-ball:before{content:"";position:absolute;left:50%;top:1%;bottom:1%;width:2px;background:#dc3b54;transform:translateX(-50%)}
+    .hero-ball .laces{position:absolute;left:50%;top:50%;width:78px;height:5px;background:#eeeef0;transform:translate(-50%,-50%) rotate(90deg);border-radius:20px}
+    .hero-ball .laces:after{content:"";position:absolute;left:8px;right:8px;top:-22px;height:50px;background:repeating-linear-gradient(90deg,transparent 0 11px,#eeeef0 11px 14px, transparent 14px 23px);transform:rotate(90deg);opacity:.8}
+    .hero-float{position:absolute;background:#ffffff15;backdrop-filter:blur(7px);border:1px solid #ffffff24;border-radius:15px;color:#fff;padding:11px 15px;display:flex;align-items:center;gap:9px;font-size:10px;font-weight:800}
+    .hero-float.one{right:310px;top:76px;transform:rotate(-6deg)}.hero-float.two{right:44px;bottom:82px;transform:rotate(5deg)}
+    .mini-disc{width:25px;height:25px;background:var(--lime);border-radius:50%;display:grid;place-items:center;color:#97152b}
+    .metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:23px}
+    .metric{background:#fff;border:1px solid #e5ece3;border-radius:16px;padding:17px 22px;display:flex;align-items:center;gap:15px;min-height:87px}
+    .metric-icon{width:44px;height:44px;border-radius:12px;background:#eff5e9;display:grid;place-items:center;color:#97152b}
+    .metric:nth-child(2) .metric-icon{background:#faeee0;color:#b91c35}
+    .metric:nth-child(3) .metric-icon{background:#ecf3f5;color:#97152b}
+    .metric-value{font-weight:900;font-size:25px;letter-spacing:-1px;line-height:1.05}
+    .metric-caption{font-size:11px;color:#7f8c82;font-weight:750;margin-top:5px}
+    .workspace{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(325px,.95fr);gap:20px;align-items:start}
+    .panel{background:#fff;border:1px solid #e2e9e0;border-radius:var(--radius);box-shadow:var(--shadow);min-width:0}
+    .panel-body{padding:22px}
+    .panel-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+    .heading-left{display:flex;align-items:center;gap:11px;min-width:0}
+    .heading-icon{height:36px;width:36px;background:#eff4ec;border-radius:10px;display:grid;place-items:center;color:#97152b}
+    h2{font-size:18px;letter-spacing:-.6px;font-weight:900;margin:0}
+    .subheading{margin:3px 0 0;font-size:11px;color:#829186;line-height:1.5}
+    .count-chip{font-size:11px;font-weight:850;border-radius:30px;padding:6px 9px;background:#e9f1e8;color:#97152b}
+    .panel-controls{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+    .searchbar{display:flex;align-items:center;border:1px solid #e2e9e0;border-radius:11px;padding:0 10px;gap:7px;background:#fbfcfa;color:#829082;flex:1;min-width:170px;max-width:330px}
+    .searchbar input{border:0;background:transparent;outline:0;padding:11px 0;font-size:12px;color:var(--ink);width:100%;min-width:0}
+    .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .toolbar .push{margin-left:auto}
+    .players-table-wrap{overflow-x:auto;margin:0 -22px;max-height:490px;overflow-y:auto}
+    .players-table{width:100%;border-collapse:collapse;min-width:515px;text-align:left}
+    .players-table thead{position:sticky;top:0;z-index:1;background:#f8faf6}
+    .players-table th{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#86948a;padding:12px 20px;font-weight:850;border-top:1px solid #eaf0e8;border-bottom:1px solid #eaf0e8}
+    .players-table td{border-bottom:1px solid #f0f3ef;padding:10px 20px;font-size:12px}
+    .players-table tr:last-child td{border-bottom:0}
+    .player-line{display:flex;align-items:center;gap:10px}
+    .avatar{width:34px;height:34px;border-radius:10px;background:#e9f2e5;color:#97152b;display:grid;place-items:center;font-size:10px;font-weight:900;flex-shrink:0}
+    .player-name{font-size:12px;font-weight:800;color:#171719}
+    .position-tag{border-radius:30px;padding:6px 9px;background:#f1f4ee;color:#97152b;font-weight:750;font-size:10px;white-space:nowrap}
+    .grade{font-weight:850;font-size:12px;color:#171719;white-space:nowrap}
+    .grade small{font-weight:700;color:#8a968b}
+    .rowactions{display:flex;justify-content:flex-end;gap:5px}
+    .icon-btn{width:31px;height:31px;border-radius:8px;display:grid;place-items:center;border:1px solid #e6ece4;background:white;color:#718374;flex-shrink:0}
+    .icon-btn:hover{background:#eef4ea;color:#97152b}.icon-btn.danger:hover{background:#ffebeb;color:#dc3b54}
+    .empty-table{text-align:center;padding:49px 25px;color:#87958a}
+    .empty-table svg{margin:0 auto 11px;color:#b91c35}
+    .empty-title{font-weight:850;font-size:14px;color:#97152b;margin-bottom:7px}
+    .empty-subtitle{font-size:12px;line-height:1.6;max-width:355px;margin:0 auto 16px}
+    .panel-footer{border-top:1px solid #edf1eb;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:11px;flex-wrap:wrap}
+    .footnote{font-size:10px;color:#96a096;line-height:1.5}
+    .text-button{border:0;background:transparent;padding:5px 0;font-weight:850;color:#97152b;font-size:11px;display:inline-flex;align-items:center;gap:6px}
+    .config-stack{display:flex;flex-direction:column;gap:19px}
+    .counter-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .field-title{font-size:12px;font-weight:850;color:#171719}
+    .field-help{font-size:11px;color:#89978d;margin:5px 0 0;line-height:1.45}
+    .stepper{display:flex;align-items:center;gap:3px;border:1px solid #dfe9dc;padding:4px;border-radius:12px;background:#f8faf6}
+    .stepper button{width:30px;height:30px;border:0;background:#fff;color:#97152b;display:grid;place-items:center;border-radius:8px;font-weight:850;font-size:17px}
+    .stepper button:hover{background:#e7f2df}
+    .stepper output{width:33px;text-align:center;font-weight:900;font-size:15px;color:#171719}
+    .info-strip{display:flex;gap:10px;background:#f2f6ec;border-radius:11px;padding:10px 12px;color:#97152b;font-size:10px;line-height:1.6}
+    .info-strip svg{color:#b91c35;margin-top:2px}
+    .section-divider{height:1px;background:#e9efe8;margin:0}
+    .criterion-list{display:flex;flex-direction:column;gap:15px}
+    .criterion-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:9px}
+    .criterion-name{font-size:12px;font-weight:800;color:#97152b;display:flex;align-items:center;gap:8px}
+    .criterion-dot{width:9px;height:9px;border-radius:50%;background:#dc3b54}
+    .criterion-actions{display:flex;align-items:center;gap:5px}
+    .weight-value{min-width:32px;border-radius:7px;padding:4px 6px;background:#eef4e8;color:#97152b;font-size:10px;text-align:center;font-weight:900}
+    .tiny-icon{width:23px;height:23px;border:0;background:transparent;color:#95a296;display:grid;place-items:center;border-radius:6px}
+    .tiny-icon:hover{color:#97152b;background:#edf3ea}
+    input[type=range]{width:100%;height:6px;accent-color:#97152b;cursor:pointer}
+    .scale-labels{display:flex;justify-content:space-between;color:#9aa79b;font-size:9px;margin-top:6px}
+    .criterion-add{display:flex;gap:7px;margin-top:16px}
+    .criterion-add input{width:100%;min-width:0;outline:0;border:1px solid #dfe7de;background:#fafbf8;border-radius:10px;padding:11px 12px;font-size:12px}
+    .criterion-add input:focus{border-color:#dc3b54}
+    .position-weight{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 0 8px}
+    .position-weight strong{font-size:12px}
+    .results-panel{margin-top:22px;overflow:hidden}
+    .results-heading{padding:22px 23px 0}
+    .results-empty{display:flex;align-items:center;gap:28px;padding:20px 45px 35px;min-height:194px}
+    .result-illustration{width:145px;flex-shrink:0}
+    .empty-result-title{font-size:18px;font-weight:900;letter-spacing:-.5px;margin:0 0 8px}
+    .empty-result-text{font-size:12px;line-height:1.75;max-width:500px;color:#819085;margin:0}
+    .result-top{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;border-top:1px solid #ecf0e9;margin-top:20px;padding:18px 22px}
+    .balance-score{display:flex;align-items:center;gap:13px}
+    .score-ring{position:relative;width:62px;height:62px;border-radius:50%;background:conic-gradient(#dc3b54 var(--percent),#e5eee2 var(--percent));display:grid;place-items:center;flex-shrink:0}
+    .score-ring:before{content:"";background:white;width:49px;height:49px;position:absolute;border-radius:50%}
+    .score-ring span{position:relative;font-size:18px;font-weight:900;color:#97152b;letter-spacing:-1px}
+    .score-label{font-size:11px;font-weight:900;color:#97152b}.score-sub{font-size:10px;margin-top:4px;color:#829384;max-width:350px;line-height:1.6}
+    .score-stats{display:flex;gap:20px;flex-wrap:wrap}
+    .score-stat{border-left:1px solid #e6ede2;padding-left:16px}
+    .score-stat strong{display:block;font-size:20px;font-weight:900;color:#97152b}
+    .score-stat span{font-size:10px;color:#829185}
+    .team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:15px;padding:4px 22px 24px}
+    .team-card{border:1px solid #e2eae0;border-radius:16px;overflow:hidden;background:#fff;min-width:0}
+    .team-card-head{border-top:5px solid var(--team-color);padding:15px 16px 12px;background:linear-gradient(180deg,var(--team-tint),white 95%)}
+    .team-name-line{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .team-title{display:flex;align-items:center;gap:8px;font-size:15px;letter-spacing:-.4px;font-weight:900}
+    .team-dot{width:11px;height:11px;border-radius:4px;background:var(--team-color)}
+    .team-headcount{color:#97152b;background:#ffffffbb;border:1px solid #e7eee3;border-radius:20px;padding:5px 9px;font-size:10px;font-weight:850;white-space:nowrap}
+    .team-avg{margin-top:13px;display:flex;justify-content:space-between;gap:7px;align-items:center}
+    .team-avg label{color:#849084;font-size:10px;font-weight:700}.team-avg strong{color:#97152b;font-size:14px;font-weight:900}
+    .team-meter{height:6px;border-radius:30px;background:#e8eee4;margin-top:8px;overflow:hidden}
+    .team-meter span{display:block;background:var(--team-color);height:100%;border-radius:30px}
+    .team-members{padding:3px 15px 11px}
+    .group-title{font-weight:900;text-transform:uppercase;letter-spacing:1px;color:#8a978a;font-size:9px;margin:13px 0 7px}
+    .member{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f0f3ef;font-size:11px}
+    .member:last-child{border-bottom:0}
+    .member-name{font-weight:800;color:#97152b}
+    .member-position{font-size:10px;color:#869386;margin-left:4px}
+    .member-rating{font-size:10px;font-weight:850;color:#97152b;white-space:nowrap}
+    .team-foot{background:#fafcf9;border-top:1px solid #edf1ea;padding:10px 15px;font-size:10px;color:#849286}
+    .comparison{border-top:1px solid #e9efe7;padding:21px 23px 24px}
+    .comparison h3{font-size:14px;font-weight:900;margin:0 0 5px;letter-spacing:-.3px}
+    .comparison p{color:#8a968b;font-size:11px;margin:0 0 15px}
+    .comparison-scroll{width:100%;overflow-x:auto}
+    .compare-table{width:100%;border-collapse:collapse;min-width:470px;font-size:11px}
+    .compare-table th,.compare-table td{padding:11px 12px;text-align:center;border-bottom:1px solid #edf1e9;white-space:nowrap}
+    .compare-table th{font-size:10px;font-weight:850;color:#859186;background:#f8faf7}
+    .compare-table th:first-child,.compare-table td:first-child{text-align:left;font-weight:850}
+    .compare-table .global-row{background:#f6f9f2;color:#97152b}
+    .compare-bar{height:5px;background:#e9efe5;border-radius:12px;margin-top:6px;overflow:hidden;min-width:45px}
+    .compare-bar span{display:block;background:#b91c35;height:100%;border-radius:12px}
+    .bottom-note{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:20px;padding:0 2px;font-size:11px;color:#93a094;line-height:1.6}
+    .bottom-note strong{color:#97152b}
+    dialog{border:0;border-radius:20px;padding:0;box-shadow:0 25px 100px #10271a55;width:min(520px,calc(100vw - 28px));max-height:90vh;overflow:auto;color:var(--ink)}
+    dialog::backdrop{background:#10291fc2;backdrop-filter:blur(4px)}
+    .modal-head{padding:21px 24px;border-bottom:1px solid #e9efe6;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .modal-title{font-size:18px;font-weight:900;letter-spacing:-.5px}
+    .modal-sub{font-size:11px;color:#89978b;margin-top:5px}
+    .modal-body{padding:22px 24px}
+    .form-field{margin-bottom:17px}.form-field label{display:block;font-size:11px;font-weight:900;color:#97152b;margin-bottom:8px}
+    .form-field input,.form-field select{display:block;width:100%;padding:11px 13px;border:1px solid #dbe6d9;border-radius:10px;background:#fbfcfa;color:#97152b;font-size:13px;outline:0}
+    .form-field input:focus,.form-field select:focus{border-color:#b91c35;background:#fff}
+    .rating-field{margin-bottom:17px;padding:11px 13px;border:1px solid #e8eee6;border-radius:11px;background:#fcfdfb}
+    .rating-field-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:9px}
+    .rating-field label{font-size:12px;font-weight:800}.rating-number{color:#97152b;background:#eaf5e3;padding:5px 8px;border-radius:7px;font-size:12px;font-weight:900}
+    .modal-foot{display:flex;justify-content:flex-end;gap:9px;background:#f8faf6;border-top:1px solid #eaf0e7;padding:16px 24px}
+    .toast{position:fixed;bottom:22px;right:22px;z-index:100;background:#97152b;color:#fff;border:1px solid #97152b;box-shadow:0 12px 40px #081a1030;padding:13px 18px;border-radius:12px;max-width:min(400px,calc(100vw - 32px));font-size:12px;font-weight:750;line-height:1.5;display:flex;gap:9px;align-items:center;opacity:0;transform:translateY(15px);pointer-events:none;transition:opacity .22s,transform .22s}
+    .toast.visible{opacity:1;transform:translateY(0)}.toast.error{background:#97152b;border-color:#b91c35}
+    .hint{font-size:10px;color:#9ba69d;margin-top:8px;line-height:1.55}
+    .sr-only{position:absolute;clip:rect(0,0,0,0);width:1px;height:1px;overflow:hidden;white-space:nowrap}
+    @media(max-width:1100px){.workspace{grid-template-columns:1fr 340px}.hero-art{right:-75px;opacity:.72}.hero-main{max-width:600px}}
+    @media(max-width:920px){.workspace{grid-template-columns:1fr}.hero-art{right:-160px;opacity:.35}.topnav{gap:13px}.privacy{display:none}.config-stack{display:grid;grid-template-columns:1fr 1fr;gap:15px}.config-stack>.panel:nth-child(2){grid-column:span 2}.results-empty{padding:22px 30px 30px}}
+    @media(max-width:650px){.page{padding:0 13px 42px}.topbar{height:70px}.brandmark{width:35px;height:35px}.brandtext{font-size:14px}.topnav{gap:12px}.topnav a{font-size:11px}.hero{padding:31px 24px;min-height:320px;border-radius:18px}.hero h1{font-size:38px;letter-spacing:-1.8px;margin:19px 0 12px}.hero p{font-size:12px;max-width:345px}.hero-art{opacity:.13;right:-225px}.eyebrow{font-size:9px}.hero-actions{margin-top:24px}.hero-actions .btn{font-size:11px}.metrics{gap:8px;margin-bottom:15px}.metric{padding:13px 11px;gap:8px;min-height:77px;flex-direction:column;align-items:flex-start}.metric-icon{display:none}.metric-value{font-size:24px}.metric-caption{font-size:9px;line-height:1.3}.panel-body{padding:17px}.panel-heading{gap:10px;margin-bottom:15px}.heading-left{gap:8px}h2{font-size:16px}.toolbar .push{margin-left:0}.searchbar{max-width:none;min-width:100%;order:-1}.toolbar .btn{flex:1}.players-table-wrap{margin:0 -17px}.players-table td,.players-table th{padding-left:14px;padding-right:14px}.config-stack{display:flex;gap:15px}.config-stack>.panel:nth-child(2){grid-column:auto}.results-heading{padding:17px 17px 0}.results-empty{padding:12px 18px 26px;min-height:160px}.result-illustration{width:75px}.empty-result-title{font-size:15px}.empty-result-text{font-size:11px}.result-top{padding:17px}.score-stats{gap:12px}.score-stat strong{font-size:17px}.team-grid{padding:0 13px 17px;gap:12px}.comparison{padding:18px 13px}.bottom-note{font-size:10px}.modal-head,.modal-body{padding:18px}.modal-foot{padding:13px 18px}}
+    @media(max-width:370px){.topnav a:last-child{display:none}.hero{padding:29px 20px}.hero h1{font-size:33px}.results-empty{gap:13px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+    /* V2 — disponibilités, tournoi et rotation hebdomadaire */
+    .modal-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .unavailable-row{opacity:.58;background:#f7f8f6}
+    .availability-pill,.sex-pill{display:inline-flex;align-items:center;white-space:nowrap;gap:4px;padding:5px 8px;font-size:10px;font-weight:850;border-radius:25px}
+    .availability-pill.ok{color:#97152b;background:#eaf5ee}.availability-pill.off{color:#b91c35;background:#f7eae3}
+    .sex-pill{background:#f0eef8;color:#b91c35}
+    .toggle-row{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:14px;border:1px solid #e2e9e0;background:#f8faf6;border-radius:12px;cursor:pointer}
+    .toggle-row strong{display:block;font-size:12px;color:#97152b}.toggle-row small{display:block;margin-top:5px;font-size:10px;color:#819183;line-height:1.5}
+    .toggle-row input{width:20px;height:20px;accent-color:#97152b;flex-shrink:0}
+    .inline-select{display:block;width:100%;font-size:12px;border-radius:10px;border:1px solid #e0e9dc;padding:11px;background:#fafcf8;color:#97152b}
+    .tournament-search{width:100%;max-width:none;margin-top:12px}
+    .tournament-roster{margin-top:8px;max-height:205px;overflow:auto;border:1px solid #e4eae0;border-radius:12px}
+    .tournament-pick{display:flex;align-items:center;gap:9px;padding:9px 12px;cursor:pointer;font-size:11px;border-bottom:1px solid #eff2ed}
+    .tournament-pick:last-child{border:0}.tournament-pick:hover{background:#f3f8f0}
+    .tournament-pick input{width:15px;height:15px;accent-color:#97152b}
+    .tournament-pick small{font-size:10px;color:#819184;margin-left:auto;text-align:right}
+    .history-panel{margin-top:20px}.history-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}
+    .history-card{border:1px solid #e4eae0;border-radius:13px;padding:13px 14px;background:#fcfdfb}
+    .history-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+    .history-card h3{margin:0;font-size:12px;color:#97152b;font-weight:900}.history-card p{font-size:10px;color:#8a958b;margin:4px 0 0}
+    .history-card details{margin-top:10px;font-size:11px;color:#97152b;line-height:1.65}.history-card summary{cursor:pointer;font-weight:850;color:#97152b}
+    .history-team{margin:10px 0 0;padding:8px;border-radius:9px;background:#f3f7f0}.history-team b{color:#97152b}
+    .history-empty{border:1px dashed #d7e3d5;background:#fafcf9;border-radius:12px;padding:20px;color:#879687;font-size:12px;line-height:1.6}
+    .team-lock-tag{font-size:9px;font-weight:900;border-radius:20px;padding:4px 7px;color:#97152b;background:#eeeef0}
+    .rotation-pill{background:#eef5ec;border-radius:10px;padding:10px 13px;margin:0 22px 20px;color:#97152b;font-size:11px;font-weight:750;line-height:1.5}
+    [hidden]{display:none!important}
+    @media(max-width:650px){.modal-form-row{gap:8px}.history-list{grid-template-columns:1fr}.rotation-pill{margin:0 13px 16px}.players-table{min-width:655px}}
+
+  
+    /* V3 — Interface rouge, noir et blanc */
+    :root{--ink:#19191e;--ink-light:#63636b;--forest:#16161b;--forest2:#222229;--lime:#d51d37;--lime-deep:#b9142d;--cream:#f4f4f5;--paper:#fff;--line:#e3e3e6;--soft:#fff0f2;--muted:#777780;--orange:#d51d37;--shadow:0 10px 32px rgba(21,21,24,.055)}
+    body{background:var(--cream);color:var(--ink)}
+    .topbar{height:80px}.brandmark{background:#17171b;color:#fff;border:2px solid #d51d37}
+    .brandtext span{color:#8a8a90}
+    .topnav{gap:8px}
+    .navtab{border:1px solid transparent;padding:11px 18px;background:transparent;border-radius:12px;font-size:12px;color:#6e6e74;font-weight:850;white-space:nowrap}
+    .navtab:hover{color:#ba152e;background:#fff0f2}.navtab.active{background:#17171b;color:#fff;border-color:#17171b}
+    .pulse-dot{background:#d51d37}.privacy{color:#606067}
+    .actionbar{margin:2px 0 19px;background:#17171b;color:#fff;border-radius:18px;display:flex;align-items:center;justify-content:flex-end;gap:13px;padding:15px 17px}
+    .action-team-label{font-size:12px;font-weight:850;color:#e3e3e8}
+    .actionbar .stepper{background:#29292f;border-color:#44444c}.actionbar .stepper button{background:#414149;color:#fff}.actionbar .stepper button:hover{background:#5b252f}.actionbar .stepper output{color:#fff;min-width:36px}
+    .btn-lime{background:#d51d37;color:#fff;box-shadow:0 6px 17px #9d0c2940}.btn-lime:hover{background:#ef304c}
+    .btn-solid{background:#17171b;color:#fff}.btn-solid:hover{background:#34343d}.btn-soft{background:#f5f5f6;color:#28282e;border-color:#e4e4e7}.btn-outline{color:#b9142d;border-color:#efb5bd}
+    .metric,.panel{border-color:#e4e4e7}.metric-icon,.heading-icon{background:#fff0f2;color:#bc1731}.metric:nth-child(2) .metric-icon{background:#ededf0;color:#202028}.metric:nth-child(3) .metric-icon{background:#fff0f2;color:#b9142d}
+    .count-chip,.weight-value{background:#fff0f2;color:#a7142d}
+    .searchbar,.criterion-add input,.inline-select,.form-field input,.form-field select{background:#fff;border-color:#e1e1e5;color:#212129}
+    .players-table thead,.compare-table th{background:#f7f7f8}.player-name,.field-title,.criterion-name,.score-label,.team-title{color:#222228}
+    .avatar{background:#fce8ec;color:#9f1630}.unavailable-row{background:#f6f6f7}.availability-pill.ok{color:#fff;background:#202025}.availability-pill.off{color:#ae1831;background:#ffe7ea}.sex-pill{background:#f1f1f3;color:#4a4a52}
+    input[type=range],input[type=checkbox]{accent-color:#d51d37}
+    .score-ring{background:conic-gradient(#d51d37 var(--percent),#ededf0 var(--percent))}.score-ring span{color:#bb1832}
+    .team-meter{background:#ececf0}.team-avg strong,.score-stat strong,.member-name{color:#24242a}.member-rating{color:#b8142e}
+    .team-card-head{background:linear-gradient(180deg,var(--team-tint),#fff 95%)}
+    .compare-bar span{background:#cf203a}.compare-table .global-row{background:#fff0f2;color:#9f1930}
+    .info-strip,.rotation-pill{background:#fff0f2;color:#8d2234}.hint,.field-help,.subheading{color:#777780}
+    .team-lock-tag{background:#17171b;color:#fff}.history-team{background:#f2f2f4}.history-team b,.history-card h3{color:#25252c}
+    .history-empty{background:#fafafa}.toast{background:#17171b;border-color:#d51d37}.toast.error{background:#a9142e}
+    .settings-intro{padding:27px 8px 23px}.settings-kicker{font-size:10px;font-weight:900;letter-spacing:2px;color:#ca1a34}.settings-intro h1{font-size:32px;letter-spacing:-1px;margin:8px 0}.settings-intro p{font-size:12px;color:#73737b;line-height:1.7;margin:0}
+    .settings-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(270px,.75fr);gap:18px;align-items:start;max-width:1030px}.settings-layout .panel{max-width:none}
+    .settings-help{background:#17171b;color:#fff;padding:25px;border-radius:18px;line-height:1.7}.settings-help h3{font-size:17px;margin:0 0 12px}.settings-help p{font-size:12px;color:#d5d5d9}.settings-help strong{color:#fff}.settings-help .btn{background:#d51d37;margin-top:12px}
+    .criterion-item{padding:12px 13px;border:1px solid #ededf0;border-radius:12px}.criterion-list{gap:10px}
+    .bottom-note strong{color:#b9142d}
+    .toggle-row{background:#fafafa;border-color:#e6e6e8}.toggle-row strong{color:#b9142d}.toggle-row small{color:#797980}.tournament-pick:hover{background:#fff0f2}.tournament-roster{border-color:#e8e8ea}
+    .team-foot,.modal-foot{background:#fafafa;border-color:#ededee;color:#6b6b73}.member-position,.group-title,.metric-caption,.compare-table th,.score-stat span{color:#707078}.history-card,.history-team{background:#fafafa;border-color:#e7e7ea}.history-card summary{color:#b9142d}
+    .score-sub,.empty-result-text,.footnote,.bottom-note,.count-chip,.scale-labels,.compare-table th,.compare-table td{line-height:1.5}
+    .metric-caption,.empty-result-text,.score-sub,.hint,.field-help,.subheading{color:#6d6d75}
+    @media(max-width:900px){.settings-layout{grid-template-columns:1fr}.settings-help{padding:20px}}
+    @media(max-width:650px){.topbar{height:72px}.privacy{display:none}.navtab{font-size:11px;padding:9px 11px}.actionbar{padding:12px;gap:8px;border-radius:13px;justify-content:center}.action-team-label{font-size:10px}.actionbar .stepper button{width:28px;height:28px}.actionbar .stepper output{min-width:22px;width:22px}.generate-btn{padding:11px 9px;font-size:10px;white-space:normal;text-align:center}.generate-btn svg{display:none}.settings-intro{padding-top:15px}.settings-intro h1{font-size:26px}}
+    @media(max-width:375px){.actionbar{gap:5px}.action-team-label{font-size:9px}.generate-btn{font-size:9px}}
+  
+    /* V4 — Ajustements des équipes et répartition des notes */
+    .brand{white-space:normal;min-width:0;flex-shrink:1}.brandtext{font-size:17px;letter-spacing:-.4px}.brandtext span{font-size:11px;letter-spacing:0;text-transform:none;color:#73737b;margin-top:3px;font-weight:750}
+    .edit-helper{margin:0 22px 17px;background:#17171b;border-left:4px solid #e02642;padding:14px 17px;border-radius:11px;color:#eaeaef;font-size:12px;line-height:1.65}.edit-helper strong{color:#fff}
+    button.member-pick{width:100%;background:transparent;border:0;border-bottom:1px solid #ededf0;text-align:left;color:inherit;border-radius:7px;transition:background .16s,padding .16s;cursor:pointer;padding:9px 8px}
+    button.member-pick:hover{background:#fff0f2}.member-pick.member-selected{background:#fff0f2;outline:2px solid #d51d37;outline-offset:-2px}.member-pick.member-selected .member-name:before{content:'✓ ';color:#c11937}.member-pick:focus-visible{outline:3px solid #d51d37;outline-offset:0}
+    .distribution-panel{margin-top:18px}.distribution-filter{display:inline-flex;align-items:center;gap:7px;background:#fafafa;border:1px solid #e8e8eb;border-radius:10px;padding:9px 11px;font-size:11px;font-weight:800;color:#34343a;cursor:pointer}.distribution-filter input{accent-color:#d51d37;width:15px;height:15px}
+    .distribution-heading{margin-bottom:13px}.distribution-summary{display:flex;align-items:center;gap:8px 20px;flex-wrap:wrap;padding:12px 15px;margin-bottom:17px;background:#f7f7f9;border:1px solid #eeeef1;border-radius:11px;font-size:11px;color:#45454b;font-weight:750}.distribution-summary strong{font-size:16px;color:#b9142d;font-weight:900}.distribution-summary .distribution-note{font-weight:600;color:#73737b;margin-left:auto}
+    .distribution-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.distribution-card{min-width:0;background:#fff;border:1px solid #e7e7ea;border-radius:14px;overflow:hidden}
+    .distribution-card-heading{padding:16px 16px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px}.distribution-criterion{display:flex;align-items:center;gap:8px;min-width:0}.distribution-criterion h3{font-size:14px;color:#1f1f25;font-weight:900;margin:0;overflow-wrap:anywhere}.distribution-average{color:#85858a;font-size:10px;white-space:nowrap}.distribution-average strong{font-size:16px;color:#b9142d}
+    .distribution-rows{padding:0 10px 11px}.distribution-grade{border-top:1px solid #f0f0f2;--grade-1:#d5d5d9;--grade-2:#8b8b96;--grade-3:#25252d;--grade-4:#d51d37}
+    .distribution-grade summary{list-style:none;display:flex;align-items:center;gap:11px;padding:9px 5px;cursor:pointer;min-width:0}.distribution-grade summary::-webkit-details-marker{display:none}.distribution-grade summary:hover{background:#fff5f6;border-radius:8px}.distribution-grade summary:focus-visible{outline:2px solid #b9142d}
+    .grade-label{font-weight:900;font-size:15px;white-space:nowrap;min-width:35px;color:#222229}.grade-label small{font-size:9px;color:#9999a0}.grade-details{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}.distribution-track{height:7px;background:#f0f0f2;border-radius:12px;overflow:hidden;width:100%}.distribution-track>span{display:block;height:100%;border-radius:12px;min-width:0}.distribution-preview{font-size:10px;color:#7c7c84;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.grade-count{display:inline-flex;align-items:center;justify-content:center;min-width:30px;padding:5px 7px;background:#f3f3f5;border-radius:8px;color:#222229;font-size:11px;font-weight:900}.grade-chevron{color:#9e9ea5;font-weight:800;transition:transform .18s}.distribution-grade[open] .grade-chevron{transform:rotate(180deg)}
+    .distribution-names{padding:4px 6px 13px 46px;display:flex;flex-wrap:wrap;gap:6px}.distribution-name{padding:6px 8px;background:#fff0f2;border:1px solid #f6d2d8;border-radius:7px;font-size:10px;color:#7e152a;font-weight:700;overflow-wrap:anywhere}.distribution-name small{font-size:9px;color:#757580}.distribution-none{font-size:10px;color:#9a9aa2;font-style:italic}
+    @media(max-width:900px){.distribution-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:760px){.distribution-grid{grid-template-columns:1fr}.distribution-summary .distribution-note{margin-left:0;width:100%}}
+    @media(max-width:650px){.topbar{gap:7px}.brand{gap:7px}.brandmark{width:33px;height:33px;flex-shrink:0}.brandtext{font-size:13px;line-height:1.16}.brandtext span{font-size:9px;line-height:1.2}.navtab{padding:9px 8px}.topnav{gap:3px}.distribution-panel .panel-body{padding:15px}.distribution-summary{gap:6px 13px}.distribution-grade summary{gap:8px}.edit-helper{margin:0 13px 14px;padding:11px 13px}.distribution-filter{font-size:10px}}
+
+    /* V5 — identité des équipes, logo, tri et synthèse interactive */
+    .logo-upload{border:1px solid #d9d9de;background:#fff;border-radius:10px;color:#a3142d;font-size:10px;font-weight:850;padding:8px 10px;white-space:nowrap;cursor:pointer;flex-shrink:0}
+    .logo-upload:hover{background:#fff0f2;border-color:#e9a4ae}
+    .brandmark{flex-shrink:0;overflow:hidden}
+    .brandmark.has-logo{background:#fff;border:1px solid #dedee4;height:54px;width:54px;padding:3px}
+    .brandmark img{display:block;width:100%;height:100%;object-fit:contain}
+    .brandmark img[hidden],.brandmark svg[hidden]{display:none}
+    .sort-header{display:inline-flex;gap:8px;align-items:center;border:none;background:none;padding:0;color:inherit;font-size:inherit;text-transform:inherit;letter-spacing:inherit;font-weight:inherit;white-space:nowrap;text-align:left}
+    .sort-header span{font-weight:900;font-size:15px;color:#9898a1;line-height:1}
+    .sort-header:hover,.sort-header.is-active{color:#ae1830}.sort-header.is-active span{color:#d51d37}
+    .players-table th:has(.sort-header.is-active){background:#fff1f3}
+    .distribution-name-button{cursor:pointer;text-align:left;font:inherit;transition:background .15s,border .15s}
+    .distribution-name-button:hover{background:#d51d37;color:#fff;border-color:#d51d37}
+    .distribution-name-button .edit-pencil{font-size:9px;margin-left:4px}
+    .distribution-name-button:hover small{color:#fff}
+    .team-label{display:inline-flex;align-items:center;border-radius:9px;background:var(--team-color);color:var(--team-ink);font-weight:900;padding:8px 11px;font-size:15px;letter-spacing:-.15px;border:1px solid rgba(0,0,0,.15)}
+    .team-card{border:1px solid #dfdfe5}.team-card-head{border-top-width:5px}
+    @media(max-width:700px){.logo-upload{padding:7px 6px;font-size:9px}.topbar{gap:5px}.topnav{margin-left:auto}.brand{gap:6px}.brandtext{font-size:12px}.brandtext span{font-size:9px}.brandmark.has-logo{height:38px;width:38px}}
+    @media(max-width:375px){.logo-upload{max-width:43px;white-space:normal;line-height:1.1;text-align:center}.brandtext{font-size:11px}.brandtext span{font-size:8px}}
+
+ 
+    /* V6 : synchronisation Supabase, authentification et etats de sauvegarde */
+    body.cloud-locked .page{filter:blur(4px);pointer-events:none;user-select:none}
+    .cloud-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid #e3e2e5;border-radius:13px;padding:9px 13px;margin:0 0 15px;font-size:11px}
+    .cloud-bar[hidden],.sync-alert[hidden],.auth-overlay[hidden]{display:none!important}
+    .cloud-tag{font-weight:850;display:inline-flex;gap:7px;align-items:center;color:#1b744a}
+    .cloud-tag:before{content:"";height:8px;width:8px;background:currentColor;border-radius:50%}
+    .cloud-tag.pending{color:#ae6710}.cloud-tag.error{color:#bb1634}
+    .cloud-bar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .cloud-user{color:#777983;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .cloud-mini{padding:7px 10px;border:1px solid #e1e1e4;border-radius:9px;background:#fff;color:#901227;font-weight:800;font-size:10px}
+    .cloud-mini:hover{background:#fff0f3}
+    .sync-alert{padding:13px 15px;border:1px solid #ffbb80;background:#fff9e8;border-radius:12px;margin:0 0 16px;display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+    .sync-alert strong{font-size:12px;color:#963309}.sync-alert p{font-size:11px;line-height:1.45;margin:4px 0;color:#753d26;max-width:800px}
+    .sync-alert-actions{display:flex;gap:7px;flex-wrap:wrap}
+    .sync-alert .cloud-mini{border-color:#efc590;background:#fffdf8}
+    .auth-overlay{position:fixed;inset:0;z-index:400;background:#161619e8;display:grid;place-items:center;padding:18px;overflow:auto}
+    .auth-card{width:min(440px,100%);background:#fff;border-radius:22px;padding:27px;box-shadow:0 24px 100px #0009}
+    .auth-header{display:flex;align-items:center;gap:12px;margin-bottom:15px}
+    .auth-badge{display:grid;place-items:center;width:49px;height:49px;background:#f9edef;border-radius:13px;font-size:25px;color:#9b142a}
+    .auth-header h2{font-size:20px;line-height:1.2;margin:0}
+    .auth-card p{color:#72737a;font-size:12px;line-height:1.6;margin:8px 0 17px}
+    .auth-card label{display:block;color:#333;font-size:11px;font-weight:800;margin:12px 0 6px}
+    .auth-card input{width:100%;border:1px solid #d9dade;border-radius:10px;padding:13px 12px;font-size:14px;color:#1d1d1f;background:#fff}
+    .auth-card input:focus{outline:2px solid #bf1739;outline-offset:1px}
+    .auth-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:19px}
+    .auth-actions .btn{flex:1}.auth-actions .btn[hidden]{display:none!important}
+    .auth-message{font-size:12px;line-height:1.5;color:#a1182e;background:#fff2f3;border:1px solid #fad7dc;border-radius:9px;padding:10px;margin-top:13px;white-space:pre-line}
+    .auth-message:empty{display:none}
+    .auth-help{font-size:10px;color:#777;margin-top:15px;line-height:1.5}
+    .password-modal{width:min(440px,calc(100vw - 28px));border:0;border-radius:20px;padding:24px;box-shadow:0 25px 85px #0007}
+    .password-modal::backdrop{background:#101013bb}
+    .password-form h2{margin:0 0 7px;font-size:20px;color:#17171b}
+    .password-form p{font-size:12px;line-height:1.55;color:#65656d;margin:0 0 18px}
+    .password-form label{display:block;font-size:12px;font-weight:850;margin:12px 0 6px}
+    .password-form input{width:100%;padding:12px;border:1px solid #d8d8de;border-radius:10px}
+    @media(max-width:650px){.cloud-bar{padding:10px;align-items:flex-start}.cloud-user{max-width:170px}.auth-card{padding:19px}.auth-header h2{font-size:17px}.sync-alert{padding:10px}}
+
+</style>
+</head>
+<body class="cloud-locked">
+  <div class="page" id="appPage" inert>
+    <header class="topbar">
+      <a class="brand" href="#accueil" aria-label="USMV touché, retour au début">
+        <div class="brandmark" id="brandmark">
+          <img id="clubLogo" alt="Logo du club USMV touché" hidden>
+          <svg id="brandPlaceholder" width="25" height="25" viewBox="0 0 26 26" fill="none" aria-hidden="true"><path d="M3.6 17.6C2 12 8.6 3.2 19.5 3.3c4.8 10.5-3.7 19.3-15.9 14.3Z" stroke="currentColor" stroke-width="1.8"/><path d="M7.5 18.9C10 12.1 14.6 7.7 19.5 6.5M10.1 15.7l4.5 3M12.7 12.6l4 2.7M15.2 9.7l3.5 2.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </div>
+        <div class="brandtext">USMV touché <span>- Gestion de l'effectif</span></div>
+      </a>
+      <button class="logo-upload" type="button" id="chooseLogo" title="Importer ou remplacer le logo du club" aria-label="Importer le logo du club">+ logo</button>
+      <input id="logoFile" type="file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" class="sr-only" aria-label="Choisir un logo">
+      <nav class="topnav" role="tablist" aria-label="Vues de l’application"><button class="navtab active" id="tabTeams" type="button" role="tab" aria-selected="true" aria-controls="mainView">Équipes</button><button class="navtab" id="tabSettings" type="button" role="tab" aria-selected="false" aria-controls="settingsView">Paramètres</button></nav>
+      <div class="privacy"><span class="pulse-dot"></span>Supabase · données partagées</div>
+    </header>
+
+    <div class="cloud-bar" id="cloudBar" hidden>
+      <span id="cloudStatus" class="cloud-tag pending" aria-live="polite">Connexion en cours...</span>
+      <div class="cloud-bar-right"><span id="cloudUser" class="cloud-user"></span><button type="button" id="cloudRefresh" class="cloud-mini">Actualiser</button><button type="button" id="cloudPassword" class="cloud-mini">Mot de passe</button><button type="button" id="cloudLogout" class="cloud-mini">Deconnexion</button></div>
+    </div>
+    <div id="syncAlert" class="sync-alert" role="alert" hidden>
+      <div><strong id="syncAlertTitle">Attention : modifications non synchronisees</strong><p id="syncAlertText">Votre copie locale est conservee.</p></div>
+      <div class="sync-alert-actions"><button class="cloud-mini" id="syncExport" type="button">Exporter ma copie</button><button class="cloud-mini" id="syncRetry" type="button" hidden>Reessayer</button><button class="cloud-mini" id="syncReload" type="button">Charger la version en ligne</button></div>
+    </div>
+
+    <main id="accueil">
+      <div id="mainView" role="tabpanel" aria-labelledby="tabTeams">
+      <section class="actionbar" aria-label="Génération des équipes">
+        <label class="action-team-label" for="teamCountOutput">Nombre d'équipes</label>
+        <div class="stepper"><button type="button" id="removeTeam" aria-label="Une équipe de moins">−</button><output id="teamCountOutput" aria-live="polite">3</output><button type="button" id="addTeam" aria-label="Une équipe de plus">+</button></div>
+        <button class="btn btn-lime generate-btn" id="generateHero" type="button"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>Générer les équipes</button>
+      </section>
+
+      <section class="metrics" aria-label="Indicateurs">
+        <div class="metric"><div class="metric-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-2a5.5 5.5 0 0 1 11 0v2M17 11a3 3 0 1 0-1-5.8M18 13a5.4 5.4 0 0 1 2.5 4.5V19"/></svg></div><div><div class="metric-value" id="statPlayers">0</div><div class="metric-caption" id="statPlayersCaption">joueurs disponibles</div></div></div>
+        <div class="metric"><div class="metric-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div><div><div class="metric-value" id="statTeams">3</div><div class="metric-caption">équipes à créer</div></div></div>
+        <div class="metric"><div class="metric-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16M7 16l4-8 4 5 2-3 3 6"/></svg></div><div><div class="metric-value" id="statPerTeam">—</div><div class="metric-caption">joueurs par équipe</div></div></div>
+      </section>
+
+      <div class="workspace">
+        <section class="panel" id="joueurs" aria-labelledby="players-heading">
+          <div class="panel-body">
+            <div class="panel-heading">
+              <div class="heading-left"><div class="heading-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div><h2 id="players-heading">Mon effectif <span class="count-chip" id="playersCountChip">0</span></h2><p class="subheading">Ajoutez, modifiez et évaluez vos joueurs.</p></div></div>
+              <button type="button" class="btn btn-solid btn-small" id="addPlayer"><span style="font-size:16px;line-height:.75">+</span> Ajouter un joueur</button>
+            </div>
+            <div class="toolbar">
+              <label class="searchbar"><svg width="15" height="15" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg><span class="sr-only">Rechercher un joueur</span><input id="playerSearch" type="search" placeholder="Rechercher un joueur…" autocomplete="off"></label>
+              <button type="button" class="btn btn-outline btn-small push" id="loadDemoHero">24 joueurs exemple</button>
+              <button type="button" class="btn btn-soft btn-small" id="importButton">Importer</button>
+              <button type="button" class="btn btn-soft btn-small" id="exportPlayers">Exporter CSV</button>
+              <input id="importFile" class="sr-only" type="file" accept=".csv,.txt,.json,application/json,text/csv,text/plain" aria-label="Choisir un fichier CSV ou JSON">
+            </div>
+            <div class="players-table-wrap" id="playersTableWrap"><div id="playersTableContainer"></div></div>
+          </div>
+          <div class="panel-footer"><span class="footnote">Notes de 1 à 4 · Cliquez sur les titres de colonnes pour trier · Sauvegarde automatique.</span><div class="panel-controls"><button class="text-button" id="exportBackup" type="button">Sauvegarde JSON ↓</button><button class="text-button" id="clearPlayers" type="button" style="color:#a06761">Vider l'effectif</button></div></div>
+        </section>
+
+        <aside class="config-stack" aria-label="Mode tournoi">
+          <section class="panel"><div class="panel-body">
+            <div class="panel-heading"><div class="heading-left"><div class="heading-icon">🏆</div><div><h2>Mode tournoi</h2><p class="subheading">Composez une équipe fixe, équilibrez les autres.</p></div></div></div>
+            <label class="toggle-row" for="tournamentToggle"><span><strong>Activer le mode tournoi</strong><small>L'équipe sélectionnée ne recevra aucun autre joueur.</small></span><input id="tournamentToggle" type="checkbox"></label>
+            <div id="tournamentControls" hidden>
+              <div class="form-field" style="margin:16px 0 11px"><label for="tournamentTeam">Équipe à composer manuellement</label><select id="tournamentTeam" class="inline-select"></select></div>
+              <div class="field-title">Joueurs verrouillés <span id="pinnedCount" class="count-chip">0</span></div>
+              <p class="field-help">Cochez les joueurs disponibles que vous souhaitez affecter à cette équipe. Leur niveau n'est pas modifié.</p>
+              <label class="searchbar tournament-search"><span class="sr-only">Chercher dans la liste tournoi</span><input id="tournamentSearch" type="search" placeholder="Filtrer les joueurs disponibles…"></label>
+              <div id="tournamentRoster" class="tournament-roster"></div>
+              <div id="tournamentHint" class="hint"></div>
+            </div>
+          </div></section>        </aside>
+      </div>
+
+      <section class="panel results-panel" id="resultats" aria-labelledby="results-heading">
+        <div class="results-heading"><div class="panel-heading"><div class="heading-left"><div class="heading-icon"><svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m4 8 4-4 4 4M8 4v10M20 16l-4 4-4-4M16 20V10M4 19c3 1.5 5 1.5 8 0M12 5c3-1.5 5-1.5 8 0"/></svg></div><div><h2 id="results-heading">La composition des équipes</h2><p class="subheading" id="resultsSubtitle">Votre futur terrain de jeu commence ici.</p></div></div><div class="panel-controls" id="resultButtons"></div></div></div>
+        <div id="resultsContent"></div>
+      </section>
+
+      <section class="panel history-panel" id="historique" aria-labelledby="historyHeading">
+        <div class="panel-body"><div class="panel-heading"><div class="heading-left"><div class="heading-icon">↺</div><div><h2 id="historyHeading">Historique des 4 dernières semaines</h2><p class="subheading">Enregistrez les équipes réellement jouées pour renouveler les associations.</p></div></div><span class="count-chip" id="historyCount">0 / 4</span></div>
+          <div id="historyContent"></div>
+          <p class="hint">Seules les compositions explicitement enregistrées comptent dans l'historique. Une nouvelle génération n'efface pas la séance précédente. L'enregistrement remplace la composition déjà enregistrée pour la semaine en cours.</p>
+        </div>
+      </section>
+      </div>
+      <section id="settingsView" role="tabpanel" aria-labelledby="tabSettings" hidden>
+        <div class="settings-intro"><div class="settings-kicker">PERSONNALISATION</div><h1>Paramètres</h1><p>Définissez les critères qui comptent pour équilibrer les niveaux. Les réglages sont enregistrés automatiquement.</p></div>
+        <div class="settings-layout">
+          <section class="panel"><div class="panel-body">
+            <div class="panel-heading"><div class="heading-left"><div class="heading-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 17h16M8 4v6M16 14v6"/></svg></div><div><h2>Critères d'équilibrage</h2><p class="subheading">Chaque critère est noté sur 4.</p></div></div></div>
+            <div id="criteriaList" class="criterion-list"></div>
+            <form id="addCriterionForm" class="criterion-add"><label class="sr-only" for="newCriterion">Nom du nouveau critère</label><input id="newCriterion" maxlength="34" placeholder="Ex. Jeu au pied, défense…" required><button class="btn btn-solid btn-small" type="submit" title="Ajouter le critère">+ Ajouter</button></form>
+            <p class="hint">Chaque joueur est noté de 1 à 4. La priorité de chaque critère se règle de 0 à 4 (0 = critère ignoré). La répartition femmes/hommes reste obligatoire.</p>
+          </div></section>
+          <aside class="settings-help"><h3>Comment fonctionne l'équilibrage ?</h3><p>Les joueurs sont notés de <strong>1 à 4</strong> pour chaque critère. Sa pondération va également de <strong>0 à 4</strong>.</p><p>La disponibilité et la répartition équitable des femmes sont obligatoires. L'algorithme privilégie ensuite l'équilibre des niveaux, puis la diversité des coéquipiers sur les quatre dernières semaines.</p><button class="btn btn-solid" id="backToTeams" type="button">← Retour aux équipes</button></aside>
+        </div>
+        <section class="panel distribution-panel" aria-labelledby="distributionTitle">
+          <div class="panel-body">
+            <div class="panel-heading distribution-heading">
+              <div class="heading-left"><div class="heading-icon" aria-hidden="true">▥</div><div><h2 id="distributionTitle">Répartition des notes par critère</h2><p class="subheading">Effectif de chaque note de 1 à 4, avec les joueurs concernés.</p></div></div>
+              <label class="distribution-filter"><input id="statsAvailableOnly" type="checkbox"> Disponibles uniquement</label>
+            </div>
+            <div id="distributionSummary" class="distribution-summary" aria-live="polite"></div>
+            <div id="distributionGrid" class="distribution-grid"></div>
+          </div>
+        </section>
+      </section>
+    </main>
+    <footer class="bottom-note"><span><strong>USMV touché</strong> · Gestion de l’effectif et des équipes.</span><span>Données sauvegardées dans Supabase et accessibles aux membres autorisés.</span></footer>
+  </div>
+
+  <section class="auth-overlay" id="authOverlay" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="auth-card">
+      <div class="auth-header"><div class="auth-badge" aria-hidden="true">&#127944;</div><div><h2 id="authTitle">USMV touché</h2><div style="font-size:11px;color:#9a1a2d;font-weight:800;margin-top:3px">Connexion aux données du club</div></div></div>
+      <p>Connectez-vous pour accéder aux joueurs et aux équipes. Les mêmes données seront disponibles sur tous vos appareils.</p>
+      <form id="authForm">
+        <label for="authEmail">Adresse email</label><input id="authEmail" type="email" autocomplete="email" placeholder="vous@exemple.fr" required>
+        <label for="authPassword">Mot de passe</label><input id="authPassword" type="password" autocomplete="current-password" minlength="6" required>
+        <div class="auth-actions"><button class="btn btn-solid" id="authLogin" type="submit">Se connecter</button><button class="btn btn-outline" id="authSignup" type="button" hidden>Créer un compte</button></div>
+      </form>
+      <div id="authMessage" class="auth-message" role="status" aria-live="polite"></div>
+      <button id="authLogout" class="cloud-mini" type="button" hidden style="margin-top:12px">Se déconnecter de ce compte</button>
+      <div class="auth-help">Compte créé par un responsable du club dans Supabase. Ne partagez jamais votre mot de passe.</div>
+    </div>
+  </section>
+
+  <dialog id="passwordDialog" class="password-modal" aria-labelledby="passwordTitle">
+    <form id="passwordForm" method="dialog" class="password-form">
+      <h2 id="passwordTitle">Modifier mon mot de passe</h2>
+      <p>Ce mot de passe sera utilisable sur tous vos appareils. Il doit comporter au minimum 10 caractères.</p>
+      <label for="passwordNext">Nouveau mot de passe</label>
+      <input id="passwordNext" type="password" minlength="10" autocomplete="new-password" required>
+      <label for="passwordConfirm">Confirmer le mot de passe</label>
+      <input id="passwordConfirm" type="password" minlength="10" autocomplete="new-password" required>
+      <div id="passwordError" class="auth-message" role="alert" aria-live="polite"></div>
+      <div class="auth-actions"><button id="passwordClose" class="btn btn-outline" type="button">Annuler</button><button class="btn btn-solid" type="submit" id="passwordSave">Enregistrer</button></div>
+    </form>
+  </dialog>
+  <dialog id="playerDialog" aria-labelledby="dialogTitle">
+    <form id="playerForm" novalidate>
+      <div class="modal-head"><div><div class="modal-title" id="dialogTitle">Ajouter un joueur</div><div class="modal-sub">Chaque note va de 1 (débutant) à 4 (excellent).</div></div><button class="icon-btn" type="button" id="closeDialog" aria-label="Fermer">✕</button></div>
+      <div class="modal-body"><div class="form-field"><label for="playerName">Nom du joueur *</label><input id="playerName" type="text" maxlength="65" required autocomplete="off" placeholder="Ex. Camille Martin"></div>
+        <div class="modal-form-row"><div class="form-field"><label for="playerSex">Sexe</label><select id="playerSex"><option value="H">Homme</option><option value="F">Femme</option></select></div><div class="form-field"><label for="playerAvailable">Disponibilité</label><select id="playerAvailable"><option value="yes">Disponible</option><option value="no">Indisponible</option></select></div></div>
+        <div id="playerRatings"></div></div>
+      <div class="modal-foot"><button class="btn btn-soft" type="button" id="cancelDialog">Annuler</button><button class="btn btn-solid" type="submit" id="savePlayer">Enregistrer le joueur</button></div>
+    </form>
+  </dialog>
+  <div class="toast" role="status" aria-live="polite" id="toast"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  'use strict';
+  (() => {
+    // ================================================================
+    // CONFIGURATION V6 - RENSEIGNEZ URL ET CLE PUBLIABLE AVANT PUBLICATION.
+    // N'utilisez JAMAIS de cle sb_secret_ ou service_role dans le HTML.
+    // ================================================================
+    const SUPABASE_URL = 'https://dhqseavsswufmpsjprkp.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_SXBcCssROmTEyjwJQkMVyg_WA_4DIbT';
+    const USMV_CLUB_ID = 'd3258ab5-0270-4cde-940e-8c7b46608e71';
+    // ================================================================
+    const STORE = 'usmv-touche-local-v6';
+    const OLD_STORE = 'rugby-equilibre-2026-v1';
+    const PENDING_KEY = 'usmv-touche-pending-v6';
+    const DEFAULT_CLUB_LOGO = 'data:image/jpeg;base64,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';
+    const COLORS = [ ['#d51d37','#fff0f3'],['#f4cb13','#fffbe2'],['#2563c9','#ebf2ff'],['#17171b','#f2f2f4'],['#ffffff','#f5f5f5'],['#16834c','#e8f7ee'],['#ec7622','#fff2e9'],['#7b46b7','#f5effc'],['#db499e','#fff0f8'],['#078c9b','#e6f8fa'],['#77808a','#eef0f2'],['#8e3541','#f9ebed'] ];
+    const TEAM_NAMES = ['Rouge','Jaune','Bleue','Noire','Blanche','Verte','Orange','Violette','Rose','Turquoise','Grise','Bordeaux'];
+    const TEAM_INK = ['#ffffff','#17171b','#ffffff','#ffffff','#17171b','#ffffff','#17171b','#ffffff','#17171b','#ffffff','#ffffff','#ffffff'];
+    const teamName = i => 'Équipe '+(TEAM_NAMES[i]||String.fromCharCode(65+i));
+    const BASE_CRITERIA = [
+      {id:'technique',name:'Technique',weight:4},
+      {id:'vitesse',name:'Vitesse',weight:3},
+      {id:'puissance',name:'Puissance',weight:3},
+      {id:'endurance',name:'Endurance',weight:3}
+    ];
+    const el = id => document.getElementById(id);
+    const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    const uid = () => typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'j'+Date.now().toString(36)+Math.random().toString(36).slice(2);
+    const clamp = (n,min,max) => Math.min(max,Math.max(min,n));
+    const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0;
+    const normalize = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'');
+    let state = {version:6,players:[],criteria:structuredClone(BASE_CRITERIA),teamCount:3,lastTeams:null,runMeta:null,tournamentMode:false,lockedTeam:0,lockedIds:[],history:[],logoDataUrl:DEFAULT_CLUB_LOGO};
+    let editingPlayerId = null;
+    let currentSearch = '';
+    let playerSort = {key:'name',dir:1};
+    let editingTeams = false;
+    let selectedSwap = null;
+    let swapUndo = null;
+    let toastTimer;
+
+    function toast(message, error=false) {
+      const target=el('toast');
+      target.textContent=message;
+      target.classList.toggle('error',error);
+      target.classList.add('visible');
+      clearTimeout(toastTimer);
+      toastTimer=setTimeout(()=>target.classList.remove('visible'),3400);
+    }
+    function safeState(input) {
+      if(!input||typeof input!=='object')throw new Error('Format JSON invalide.');
+      const legacy=Number(input.version||1)<2;
+      const criteria=(Array.isArray(input.criteria)?input.criteria:BASE_CRITERIA).slice(0,12).map((c,i)=>({
+        id:String(c.id ?? 'crit-'+i).slice(0,70),name:String(c.name||'Critère '+(i+1)).trim().slice(0,34),weight:clamp(Math.round(Number(c.weight)||0),0,4)
+      })).filter(c=>c.name);
+      if(!criteria.length)throw new Error('La sauvegarde doit contenir au moins un critère.');
+      const criterionIds=new Set();criteria.forEach(c=>{if(criterionIds.has(c.id))c.id=uid();criterionIds.add(c.id)});
+      const players=(Array.isArray(input.players)?input.players:[]).slice(0,600).map((p,i)=>{
+        const ratings={};criteria.forEach(c=>{const n=Number(p.ratings?.[c.id]);ratings[c.id]=Number.isFinite(n)?clamp(Math.round(legacy?(1+(clamp(n,1,5)-1)*3/4):n),1,4):3});
+        const rawSex=normalize(p.sex||'homme');
+        return {id:String(p.id||uid()),name:String(p.name??'').trim().slice(0,65)||'Joueur '+(i+1),ratings,sex:['f','femme','female'].includes(rawSex)?'F':'H',available:p.available!==false && p.available!=='false' && p.available!==0};
+      });
+      const used=new Set();players.forEach(p=>{if(used.has(p.id))p.id=uid();used.add(p.id)});
+      const history=(Array.isArray(input.history)?input.history:[]).slice(0,12).filter(h=>h&&typeof h==='object'&&/^\d{4}-\d{2}-\d{2}$/.test(h.week)&&Array.isArray(h.teams)).map(h=>({
+        week:h.week,teams:h.teams.slice(0,12).map(t=>Array.isArray(t)?t.slice(0,600).map(m=>({id:String(m.id||''),name:String(m.name||'Joueur').slice(0,65)})).filter(m=>m.id):[])
+      }));
+      const teamCount=clamp(Math.round(Number(input.teamCount)||3),2,12);
+      const eligible=new Set(players.filter(p=>p.available).map(p=>p.id));
+      let lastTeams=null,runMeta=null;
+      if(Array.isArray(input.lastTeams)&&input.lastTeams.length===teamCount){
+        const assigned=input.lastTeams.flat();
+        if(assigned.length===eligible.size&&new Set(assigned).size===eligible.size&&assigned.every(id=>eligible.has(id))){lastTeams=input.lastTeams;runMeta=input.runMeta||null}
+      }
+      return {version:6,players,criteria,teamCount,lastTeams,runMeta,
+        tournamentMode:input.tournamentMode===true,lockedTeam:clamp(Math.round(Number(input.lockedTeam)||0),0,teamCount-1),lockedIds:(Array.isArray(input.lockedIds)?input.lockedIds:[]).filter(id=>eligible.has(id)),history:pruneHistory(history),
+        logoDataUrl:typeof input.logoDataUrl==='string' && /^data:image\/(png|jpeg|webp);base64,[a-z0-9+/=]+$/i.test(input.logoDataUrl) && input.logoDataUrl.length<850000?input.logoDataUrl:DEFAULT_CLUB_LOGO};
+    }
+    function weekStart(date=new Date()) {
+      const d=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+      d.setDate(d.getDate()-(d.getDay()+6)%7);
+      const yyyy=d.getFullYear(),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
+      return yyyy+'-'+mm+'-'+dd;
+    }
+    function parseWeek(s){const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
+    function pruneHistory(items){
+      const now=parseWeek(weekStart()),low=new Date(now);low.setDate(low.getDate()-21);
+      const unique=new Map();
+      items.forEach(h=>{const dt=parseWeek(h.week);if(!Number.isNaN(dt.getTime())&&dt>=low&&dt<=now)unique.set(h.week,h)});
+      return Array.from(unique.values()).sort((a,b)=>b.week.localeCompare(a.week)).slice(0,4);
+    }
+    const availablePlayers=()=>state.players.filter(p=>p.available);
+    const sortedPlayers=ps=>ps.slice().sort((a,b)=>a.name.localeCompare(b.name,'fr',{sensitivity:'base',numeric:true}));
+    let cloudClient=null, cloudReady=false, cloudLoading=false, remoteRevision=null;
+    let cloudDirty=false, cloudSaving=false, cloudConflict=false, cloudChannel=null;
+    let cloudRetry=false, cloudTimer=null, cloudRefreshBusy=false, pendingRemoteRefresh=false;
+    let pendingCacheAtLogin=false;
+
+    function cloudStatus(text, kind='ok') {
+      const status=el('cloudStatus');
+      status.textContent=text;
+      status.className='cloud-tag'+(kind==='ok'?'':' '+(kind==='pending'?'pending':'error'));
+    }
+    function authMessage(message){el('authMessage').textContent=message;}
+    function localSnapshot(pending) {
+      try {
+        localStorage.setItem(STORE,JSON.stringify(state));
+        if(pending===true)localStorage.setItem(PENDING_KEY,'1');
+        if(pending===false)localStorage.removeItem(PENDING_KEY);
+      } catch(error){console.warn('Stockage local indisponible',error)}
+    }
+    function showSyncAlert(title,message,retry=false){
+      el('syncAlertTitle').textContent=title;
+      el('syncAlertText').textContent=message;
+      el('syncAlert').hidden=false;
+      el('syncRetry').hidden=!retry;
+    }
+    function clearSyncAlert(){el('syncAlert').hidden=true;cloudRetry=false;}
+    function exportJSONCopy(){
+      let raw=null;
+      try{raw=localStorage.getItem(STORE)}catch(_){/* navigateur prive */}
+      if(!raw)raw=JSON.stringify(state,null,2);
+      download('USMV-copie-locale-a-conserver.json',raw,'application/json;charset=utf-8');
+      toast('Copie locale exportee. Conservez ce fichier avant toute restauration.');
+    }
+    function save() {
+      // Chaque action conserve d'abord une copie recuperable dans CE navigateur.
+      localSnapshot(true);
+      if(!cloudReady)return;
+      cloudDirty=true;
+      if(cloudConflict){cloudStatus('Conflit : copie locale conservee','error');return}
+      cloudStatus('Modifications en attente...','pending');
+      clearTimeout(cloudTimer);
+      cloudTimer=setTimeout(flushCloud,500);
+    }
+    async function flushCloud(){
+      if(!cloudReady||!cloudDirty||cloudSaving||cloudConflict)return;
+      if(remoteRevision===null)return;
+      cloudSaving=true;
+      cloudDirty=false;
+      cloudRetry=false;
+      const current=JSON.stringify(state);
+      const before=remoteRevision;
+      cloudStatus('Enregistrement Supabase...','pending');
+      try{
+        const {data,error}=await cloudClient.rpc('usmv_save_club',{
+          p_club_id:USMV_CLUB_ID,p_expected_revision:before,p_data:JSON.parse(current)
+        });
+        if(error)throw error;
+        if(data===null||data===undefined){
+          cloudDirty=true;cloudConflict=true;
+          cloudStatus('Conflit de modifications','error');
+          showSyncAlert('Modifications simultanees detectees',
+            'Un autre appareil a modifie les donnees depuis votre derniere version. Exportez votre copie locale, puis rechargez la version en ligne. Vous pourrez ensuite reimporter votre fichier JSON.');
+          return;
+        }
+        remoteRevision=Number(data);
+        if(JSON.stringify(state)===current&&!cloudDirty){
+          localSnapshot(false);
+          cloudStatus('Sauvegarde synchronisee');
+          clearSyncAlert();
+        }else{
+          cloudDirty=true;
+          localSnapshot(true);
+          cloudStatus('Nouvelles modifications en attente...','pending');
+        }
+      }catch(error){
+        cloudDirty=true;cloudRetry=true;
+        cloudStatus('Erreur : non synchronise','error');
+        showSyncAlert('Impossible d’enregistrer dans Supabase',
+          'Verifiez votre connexion internet. La derniere copie est conservee localement : exportez-la si necessaire, puis reessayez.',true);
+        console.error('Echec de synchronisation',error);
+      }finally{
+        cloudSaving=false;
+        if(cloudDirty&&!cloudRetry&&!cloudConflict){clearTimeout(cloudTimer);cloudTimer=setTimeout(flushCloud,250)}
+        if(pendingRemoteRefresh&&!cloudDirty){pendingRemoteRefresh=false;refreshCloud()}
+      }
+    }
+    async function fetchCloud(){
+      const {data,error}=await cloudClient.from('usmv_clubs').select('revision,data').eq('id',USMV_CLUB_ID).maybeSingle();
+      if(error)throw error;
+      if(!data)throw new Error('Compte authentifie mais non autorise pour ce club. Demandez au responsable de vous ajouter dans la table usmv_members, puis reconnectez-vous.');
+      return data;
+    }
+    function applyCloud(record){
+      const next=safeState(record.data||{});
+      state=next;
+      remoteRevision=Number(record.revision);
+      editingTeams=false;selectedSwap=null;swapUndo=null;
+      if(el('playerDialog').open)el('playerDialog').close();
+      renderAll();
+      if(!pendingCacheAtLogin)localSnapshot(false);
+      cloudStatus('Sauvegarde synchronisee');
+    }
+    async function refreshCloud(force=false){
+      if(!cloudReady||cloudRefreshBusy)return;
+      cloudRefreshBusy=true;
+      try{
+        const record=await fetchCloud();
+        const revision=Number(record.revision);
+        if(force||revision>remoteRevision){
+          if(!force&&(cloudSaving||cloudDirty||cloudConflict||el('playerDialog').open)){
+            pendingRemoteRefresh=true;
+            if(!cloudSaving){
+              cloudConflict=true;
+              cloudStatus('Nouvelles donnees sur un autre appareil','error');
+              showSyncAlert('Des modifications ont ete faites ailleurs',
+                'Votre saisie locale est preservee. Exportez votre copie avant de charger les donnees a jour.');
+            }
+            return;
+          }
+          if(force){
+            cloudDirty=false;cloudConflict=false;cloudRetry=false;
+            pendingCacheAtLogin=false;
+          }
+          applyCloud(record);
+          clearSyncAlert();
+          if(!force)toast('Les changements d’un autre appareil ont ete appliques.');
+        }
+      }catch(error){
+        cloudStatus('Connexion Supabase interrompue','error');
+        console.error(error);
+        if(force)showSyncAlert('Impossible de charger la version en ligne',String(error.message||error),true);
+      }finally{cloudRefreshBusy=false}
+    }
+    function startCloudRealtime(){
+      if(cloudChannel)cloudClient.removeChannel(cloudChannel);
+      cloudChannel=cloudClient.channel('usmv-club-'+USMV_CLUB_ID)
+        .on('postgres_changes',{event:'UPDATE',schema:'public',table:'usmv_clubs',filter:'id=eq.'+USMV_CLUB_ID},()=>{
+          if(cloudSaving){pendingRemoteRefresh=true;return}
+          refreshCloud();
+        }).subscribe();
+    }
+    function lockApp(){
+      cloudReady=false;cloudLoading=false;remoteRevision=null;
+      cloudDirty=false;cloudSaving=false;cloudConflict=false;
+      clearTimeout(cloudTimer);cloudTimer=null;
+      if(cloudClient&&cloudChannel){cloudClient.removeChannel(cloudChannel);cloudChannel=null}
+      el('cloudBar').hidden=true;
+      el('authOverlay').hidden=false;
+      el('appPage').inert=true;
+      document.body.classList.add('cloud-locked');
+      el('authLogout').hidden=true;
+      el('authForm').hidden=false;
+      el('authPassword').value='';
+      if(el('passwordDialog').open)el('passwordDialog').close();
+    }
+    async function openCloudSession(session){
+      if(cloudLoading||cloudReady||!session)return;
+      cloudLoading=true;
+      authMessage('Compte connecte, verification des droits au club...');
+      try{
+        const record=await fetchCloud();
+        // Ne jamais ecraser silencieusement une copie hors ligne non synchronisee.
+        try{pendingCacheAtLogin=localStorage.getItem(PENDING_KEY)==='1'&&!!localStorage.getItem(STORE)}catch(_){pendingCacheAtLogin=false}
+        applyCloud(record);
+        cloudReady=true;
+        el('cloudUser').textContent=session.user?.email||'Compte connecte';
+        el('cloudBar').hidden=false;
+        el('authOverlay').hidden=true;
+        el('appPage').inert=false;
+        document.body.classList.remove('cloud-locked');
+        authMessage('');
+        startCloudRealtime();
+        if(pendingCacheAtLogin){
+          cloudConflict=true;
+          cloudStatus('Copie locale non synchronisee','error');
+          showSyncAlert('Une copie locale non synchronisee existe',
+            'Elle a ete conservee dans ce navigateur. Exportez cette copie avant de choisir Charger la version en ligne. Vous pourrez ensuite reimporter le fichier JSON si besoin.');
+        }
+        // Les modifications ne sont jamais transferees automatiquement avant connexion.
+      }catch(error){
+        authMessage(error.message||'Impossible de recuperer les donnees du club.');
+        el('authForm').hidden=true;
+        el('authLogout').hidden=false;
+      }finally{cloudLoading=false}
+    }
+    async function cloudSignIn(event){
+      event.preventDefault();
+      if(!cloudClient){authMessage('Configuration Supabase manquante.');return}
+      const email=el('authEmail').value.trim();
+      const password=el('authPassword').value;
+      el('authLogin').disabled=true;
+      authMessage('Connexion en cours...');
+      try{
+        const {data,error}=await cloudClient.auth.signInWithPassword({email,password});
+        if(error)throw error;
+        await openCloudSession(data.session);
+      }catch(error){authMessage(error.message||'Connexion impossible.')}finally{el('authLogin').disabled=false}
+    }
+    async function cloudSignUp(){
+      if(!cloudClient){authMessage('Configuration Supabase manquante.');return}
+      const email=el('authEmail').value.trim(),password=el('authPassword').value;
+      if(!el('authEmail').checkValidity()||password.length<6){authMessage('Saisissez une adresse email valide et un mot de passe d’au moins 6 caracteres.');return}
+      el('authSignup').disabled=true;
+      authMessage('Creation du compte en cours...');
+      try{
+        const redirect=window.location.origin+window.location.pathname;
+        const {data,error}=await cloudClient.auth.signUp({email,password,options:{emailRedirectTo:redirect}});
+        if(error)throw error;
+        if(data.session){await openCloudSession(data.session)}
+        else authMessage('Compte cree (si cette adresse est acceptee). Verifiez votre boite email pour confirmer votre inscription. Ensuite, le responsable doit autoriser votre compte dans Supabase.');
+      }catch(error){authMessage(error.message||'Inscription impossible.')}finally{el('authSignup').disabled=false}
+    }
+    async function cloudSignOut(){
+      if((cloudDirty||cloudConflict||cloudSaving)&&!confirm('Des modifications ne sont peut-etre pas synchronisees. Exportez une sauvegarde JSON avant de vous deconnecter. Continuer ?'))return;
+      if(cloudClient)await cloudClient.auth.signOut();
+      lockApp();
+      authMessage('Vous etes deconnecte.');
+    }
+    async function initCloud(){
+      const ready=/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL)
+        &&SUPABASE_PUBLISHABLE_KEY.startsWith('sb_publishable_')
+        &&/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(USMV_CLUB_ID);
+      if(!ready){
+        authMessage('Configuration a completer : ouvrez index.html et remplacez SUPABASE_URL et SUPABASE_PUBLISHABLE_KEY. Consultez le guide fourni.');
+        el('authForm').hidden=true;
+        return;
+      }
+      if(!window.supabase||!window.supabase.createClient){
+        authMessage('La bibliotheque Supabase ne s’est pas chargee. Verifiez votre acces a internet, puis actualisez la page.');
+        el('authForm').hidden=true;
+        return;
+      }
+      cloudClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
+        auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+      });
+      cloudClient.auth.onAuthStateChange((event,session)=>{
+        if(event==='SIGNED_OUT'&&cloudReady)setTimeout(lockApp,0);
+        if(event==='SIGNED_IN'&&session&&!cloudReady&&!cloudLoading)setTimeout(()=>openCloudSession(session),0);
+      });
+      try{
+        const {data,error}=await cloudClient.auth.getSession();
+        if(error)throw error;
+        if(data.session)await openCloudSession(data.session);
+        else authMessage('Connectez-vous ou creez un compte, puis demandez l’autorisation pour rejoindre le club.');
+      }catch(error){authMessage('Session inaccessible : '+String(error.message||error))}
+    }
+    function changeState(invalidate=true) {
+      if(invalidate){
+        state.lastTeams=null;state.runMeta=null;
+        editingTeams=false;selectedSwap=null;swapUndo=null;
+      }
+      save();renderAll();
+    }
+    function playerAverage(player) {
+      let w=0,total=0;
+      state.criteria.forEach(c=>{if(c.weight){total+=(player.ratings[c.id]||3)*c.weight;w+=c.weight}});
+      return w?total/w:avg(state.criteria.map(c=>player.ratings[c.id]||3));
+    }
+    function totalLabel(n) {return String(n).replace('.',',')}
+    function renderMetrics() {
+      const n=availablePlayers().length,t=state.teamCount;
+      el('statPlayers').textContent=n;
+      el('statTeams').textContent=t;
+      const low=Math.floor(n/t),high=Math.ceil(n/t);
+      if(state.tournamentMode && state.lockedIds.length){
+        const pinned=state.lockedIds.filter(id=>availablePlayers().some(p=>p.id===id)).length;
+        const rest=n-pinned,otherLow=Math.floor(rest/(t-1)),otherHigh=Math.ceil(rest/(t-1));
+        el('statPerTeam').textContent=pinned+' fixe · '+(otherLow===otherHigh?otherLow:otherLow+'–'+otherHigh)+' autres';
+      }else el('statPerTeam').textContent=n===0?'—':low===high?String(low):low+'–'+high;
+      el('playersCountChip').textContent=state.players.length+' total';
+      el('statPlayersCaption').textContent='disponibles / '+state.players.length+' inscrits';
+      el('teamCountOutput').textContent=t;
+      el('removeTeam').disabled=t<=2;
+      el('addTeam').disabled=t>=12;
+    }
+    function renderPlayers() {
+      const filtered=state.players.filter(p=>normalize(p.name).includes(normalize(currentSearch))).sort((a,b)=>{
+        const key=playerSort.key;
+        const get=p=>key==='name'?p.name:key==='sex'?(p.sex==='F'?0:1):key==='rating'?playerAverage(p):p.available?1:0;
+        const va=get(a),vb=get(b);
+        const primary=typeof va==='number'?va-vb:String(va).localeCompare(String(vb),'fr',{sensitivity:'base',numeric:true});
+        return primary?playerSort.dir*primary:a.name.localeCompare(b.name,'fr',{sensitivity:'base',numeric:true});
+      });
+      const target=el('playersTableContainer');
+      if(!state.players.length){target.innerHTML=`<div class="empty-table"><div class="empty-title">Votre effectif est encore vide</div><p class="empty-subtitle">Ajoutez vos joueurs, importez un fichier ou chargez l'exemple.</p><button type="button" class="btn btn-soft btn-small" data-action="demo">Charger 24 joueurs d'exemple</button></div>`;return}
+      if(!filtered.length){target.innerHTML='<div class="empty-table"><div class="empty-title">Aucun joueur trouvé</div></div>';return}
+      const sortHeader=(key,title)=>`<th scope="col" aria-sort="${playerSort.key===key?(playerSort.dir===1?'ascending':'descending'):'none'}"><button type="button" class="sort-header ${playerSort.key===key?'is-active':''}" data-sort="${key}" aria-label="Trier par ${title}">${title}<span aria-hidden="true">${playerSort.key===key?(playerSort.dir===1?'↑':'↓'):'↕'}</span></button></th>`;
+      target.innerHTML=`<table class="players-table"><thead><tr>${sortHeader('name','Joueur')}${sortHeader('sex','Sexe')}${sortHeader('rating','Note')}${sortHeader('available','Disponibilité')}<th scope="col" style="text-align:right">Actions</th></tr></thead><tbody>${filtered.map(p=>{
+        const initials=p.name.split(/\s+/).slice(0,2).map(w=>w.charAt(0).toUpperCase()).join('');
+        return `<tr class="${p.available?'':'unavailable-row'}"><td><div class="player-line"><span class="avatar">${escapeHtml(initials)}</span><span class="player-name">${escapeHtml(p.name)}</span></div></td><td><span class="sex-pill">${p.sex==='F'?'Femme':'Homme'}</span></td><td class="grade">${totalLabel(playerAverage(p).toFixed(1))} <small>/ 4</small></td>
+          <td><button class="availability-pill ${p.available?'ok':'off'}" type="button" data-action="toggle" data-id="${escapeHtml(p.id)}" title="Changer la disponibilité de ${escapeHtml(p.name)}" aria-label="${escapeHtml(p.name)} : ${p.available?'disponible':'indisponible'}, changer">${p.available?'● Disponible':'○ Indisponible'}</button></td>
+          <td><div class="rowactions"><button class="icon-btn" data-action="edit" data-id="${escapeHtml(p.id)}" title="Modifier ${escapeHtml(p.name)}" aria-label="Modifier ${escapeHtml(p.name)}">✎</button><button class="icon-btn danger" data-action="delete" data-id="${escapeHtml(p.id)}" title="Supprimer ${escapeHtml(p.name)}" aria-label="Supprimer ${escapeHtml(p.name)}">×</button></div></td></tr>`;
+      }).join('')}</tbody></table>`;
+    }
+    function renderCriteria() {
+      el('criteriaList').innerHTML=state.criteria.map((c,i)=>`<div class="criterion-item"><div class="criterion-top"><div class="criterion-name"><span class="criterion-dot" style="background:${COLORS[i%COLORS.length][0]}"></span>${escapeHtml(c.name)}</div><div class="criterion-actions"><span class="weight-value" id="weight-out-${i}">${c.weight} / 4</span><button class="tiny-icon" type="button" title="Renommer ${escapeHtml(c.name)}" data-action="rename" data-id="${escapeHtml(c.id)}" aria-label="Renommer ${escapeHtml(c.name)}">✎</button><button class="tiny-icon" type="button" title="Supprimer ${escapeHtml(c.name)}" data-action="remove" data-id="${escapeHtml(c.id)}" aria-label="Supprimer ${escapeHtml(c.name)}">×</button></div></div><input type="range" min="0" max="4" step="1" value="${c.weight}" data-criterion="${escapeHtml(c.id)}" data-index="${i}" aria-label="Poids du critère ${escapeHtml(c.name)}"><div class="scale-labels"><span>Faible priorité</span><span>Très important</span></div></div>`).join('');
+    }
+    function renderDistribution() {
+      const roster=sortedPlayers(state.players.filter(p=>!el('statsAvailableOnly').checked||p.available));
+      const female=roster.filter(p=>p.sex==='F').length;
+      el('distributionSummary').innerHTML=`<span><strong>${roster.length}</strong> personne${roster.length>1?'s':''} ${el('statsAvailableOnly').checked?'disponible'+(roster.length>1?'s':''):'au total'}</span><span><strong>${female}</strong> femme${female>1?'s':''}</span><span><strong>${roster.length-female}</strong> homme${roster.length-female>1?'s':''}</span><span class="distribution-note">Cliquez sur une note puis sur un nom pour modifier son profil.</span>`;
+      if(!roster.length){el('distributionGrid').innerHTML='<div class="history-empty">Aucun joueur dans cette sélection. Ajoutez des joueurs ou désactivez le filtre.</div>';return}
+      el('distributionGrid').innerHTML=state.criteria.map((c,i)=>{
+        const groups=[1,2,3,4].map(grade=>roster.filter(p=>(p.ratings[c.id]||3)===grade));
+        const average=avg(roster.map(p=>p.ratings[c.id]||3));
+        return `<article class="distribution-card"><div class="distribution-card-heading"><div class="distribution-criterion"><span class="criterion-dot" style="background:${COLORS[i%COLORS.length][0]}"></span><h3>${escapeHtml(c.name)}</h3></div><div class="distribution-average">Moy. <strong>${totalLabel(average.toFixed(2))}</strong> / 4</div></div><div class="distribution-rows">${groups.map((list,j)=>{
+          const percent=roster.length?100*list.length/roster.length:0;
+          const preview=list.slice(0,2).map(p=>p.name).join(', ')+(list.length>2?' +'+(list.length-2):'');
+          return `<details class="distribution-grade"><summary aria-label="${escapeHtml(c.name)}, note ${j+1} sur 4, ${list.length} joueurs. Afficher les noms"><span class="grade-label">${j+1}<small>/4</small></span><span class="grade-details"><span class="distribution-track"><span style="width:${percent.toFixed(1)}%;background:var(--grade-${j+1})"></span></span><span class="distribution-preview">${escapeHtml(preview||'Aucun joueur')}</span></span><span class="grade-count">${list.length}</span><span class="grade-chevron">⌄</span></summary><div class="distribution-names">${list.length?list.map(p=>`<button class="distribution-name distribution-name-button" type="button" data-edit-player="${escapeHtml(p.id)}" aria-label="Modifier le profil de ${escapeHtml(p.name)}" title="Modifier le profil de ${escapeHtml(p.name)}">${escapeHtml(p.name)}${p.available?'':' <small>absent</small>'} <span class="edit-pencil" aria-hidden="true">✎</span></button>`).join(''):'<span class="distribution-none">Aucun joueur avec cette note.</span>'}</div></details>`;
+        }).join('')}</div></article>`;
+      }).join('');
+    }
+    function skillScoreForTeams(teams) {
+      const roster=teams.flat().map(id=>state.players.find(p=>p.id===id)).filter(Boolean);
+      const weights=state.criteria.map(c=>Math.max(0,c.weight));
+      const sum=weights.reduce((a,b)=>a+b,0);
+      const normalized=weights.map(w=>sum?w/sum:1/weights.length);
+      const goals=state.criteria.map(c=>avg(roster.map(p=>p.ratings[c.id]||3)));
+      return avg(teams.map(ids=>{
+        const players=ids.map(id=>state.players.find(p=>p.id===id)).filter(Boolean);
+        return state.criteria.reduce((loss,c,i)=>loss+normalized[i]*(avg(players.map(p=>p.ratings[c.id]||3))-goals[i])**2,0);
+      }));
+    }
+    function swapPlayers(id) {
+      if(!editingTeams||!state.lastTeams)return;
+      const targetTeam=state.lastTeams.findIndex(t=>t.includes(id));
+      if(targetTeam<0)return;
+      if(state.runMeta?.mode==='tournoi' && targetTeam===state.runMeta.lockedTeam){toast('L’équipe de tournoi est verrouillée. Modifiez sa sélection dans le mode tournoi puis régénérez.',true);return}
+      if(!selectedSwap){selectedSwap=id;renderResults();return}
+      if(selectedSwap===id){selectedSwap=null;renderResults();return}
+      const sourceTeam=state.lastTeams.findIndex(t=>t.includes(selectedSwap));
+      if(sourceTeam<0){selectedSwap=id;renderResults();return}
+      if(sourceTeam===targetTeam){selectedSwap=id;renderResults();return}
+      const first=state.players.find(p=>p.id===selectedSwap),second=state.players.find(p=>p.id===id);
+      if(!first||!second){selectedSwap=null;return}
+      const draft=state.lastTeams.map(ids=>ids.slice());
+      draft[sourceTeam][draft[sourceTeam].indexOf(first.id)]=second.id;
+      draft[targetTeam][draft[targetTeam].indexOf(second.id)]=first.id;
+      const women=draft.map(team=>team.filter(pid=>state.players.find(p=>p.id===pid)?.sex==='F').length);
+      if(Math.max(...women)-Math.min(...women)>1){
+        toast('Échange impossible : la répartition des femmes doit rester équitable. Sélectionnez un autre joueur.',true);
+        selectedSwap=null;renderResults();return;
+      }
+      swapUndo={teams:state.lastTeams.map(t=>t.slice()),meta:{...state.runMeta}};
+      state.lastTeams=draft;
+      const score=skillScoreForTeams(draft);
+      state.runMeta={...state.runMeta,score,fairness:clamp(Math.round(100-35*Math.sqrt(Math.max(0,score))),0,100),manualEdits:(state.runMeta?.manualEdits||0)+1};
+      selectedSwap=null;changeState(false);
+      toast(`${first.name} et ${second.name} ont échangé d’équipe.`);
+    }
+    function renderResults() {
+      const actions=el('resultButtons'), body=el('resultsContent');
+      if(!state.lastTeams){
+        el('resultsSubtitle').textContent='Votre futur terrain de jeu commence ici.';
+        actions.innerHTML='';
+        body.innerHTML=`<div class="results-empty"><svg class="result-illustration" viewBox="0 0 150 130" fill="none" aria-hidden="true"><rect x="12" y="10" width="126" height="110" rx="15" fill="#fff0f2"/><rect x="21" y="20" width="108" height="90" rx="6" stroke="#d8a3ae" stroke-width="1.6"/><path d="M75 20v90M21 65h108" stroke="#d8a3ae" stroke-width="1.6" stroke-dasharray="4 3"/><circle cx="75" cy="65" r="20" stroke="#d8a3ae" stroke-width="1.6"/><circle cx="50" cy="42" r="8" fill="#d51d37"/><circle cx="95" cy="85" r="8" fill="#17171b"/><circle cx="95" cy="42" r="8" fill="#a7142d"/><circle cx="50" cy="87" r="8" fill="#74747d"/><path d="m52 40-4 4m4 0-4-4M97 83l-4 4m4 0-4-4" stroke="#fff" stroke-width="1.5"/></svg><div><h3 class="empty-result-title">À vous de composer le jeu.</h3><p class="empty-result-text">Dès que votre effectif est prêt, cliquez sur <strong>Générer les équipes</strong>. L'application proposera une répartition en équilibrant les niveaux, sans modifier vos données.</p></div></div>`;
+        return;
+      }
+      const teams=state.lastTeams.map(ids=>ids.map(id=>state.players.find(p=>p.id===id)).filter(Boolean));
+      const meta=state.runMeta||{};
+      const teamLevels=teams.map(t=>avg(t.map(playerAverage)));
+      const spread=Math.max(...teamLevels)-Math.min(...teamLevels);
+      const fairness=typeof meta.fairness==='number'?meta.fairness:Math.round(100-spread*15);
+      const participating=teams.flat();
+      el('resultsSubtitle').textContent='Joueurs disponibles uniquement · Répartition femmes équitable · Niveau prioritaire.';
+      actions.innerHTML=`<button class="btn ${editingTeams?'btn-solid':'btn-outline'} btn-small" type="button" data-result="edit" aria-pressed="${editingTeams}">${editingTeams?'✓ Terminer les ajustements':'✎ Modifier les équipes'}</button>${editingTeams&&swapUndo?'<button class="btn btn-outline btn-small" type="button" data-result="undo">↶ Annuler l’échange</button>':''}<button class="btn btn-outline btn-small" type="button" data-result="csv">Télécharger CSV ↓</button><button class="btn btn-solid btn-small" type="button" data-result="png">Exporter image PNG ↓</button><button class="btn btn-soft btn-small" type="button" data-result="save-week">✓ Enregistrer cette semaine</button><button class="btn btn-solid btn-small" type="button" data-result="again">↻ Nouvelle répartition</button>`;
+      body.innerHTML=`${editingTeams?`<div class="edit-helper" role="status"><strong>Mode ajustement</strong> ${selectedSwap?`1 joueur sélectionné : <strong>${escapeHtml(state.players.find(p=>p.id===selectedSwap)?.name||'')}</strong>. Cliquez sur un joueur d’une autre équipe pour échanger. Cliquez de nouveau pour annuler.`:'Cliquez sur un joueur, puis un joueur d’une autre équipe pour les échanger. La répartition équitable des femmes reste obligatoire.'}${meta.mode==='tournoi'?' L’équipe fixe du tournoi n’est pas modifiable.':''}</div>`:''}<div class="result-top"><div class="balance-score"><div class="score-ring" style="--percent:${clamp(fairness,0,100)}%"><span>${clamp(fairness,0,100)}</span></div><div><div class="score-label">Indice d'équilibre <span style="color:#95a395;font-weight:650">/ 100</span></div><div class="score-sub">Indicateur heuristique calculé à partir des niveaux. La priorité reste le niveau ; la rotation historique est secondaire.</div></div></div><div class="score-stats"><div class="score-stat"><strong>${spread.toFixed(2).replace('.',',')}</strong><span>écart max. de niveau / 4</span></div><div class="score-stat"><strong>${teams.length}</strong><span>équipes constituées</span></div></div></div>
+        <div class="rotation-pill">${participating.filter(p=>p.sex==='F').length} femmes au total · ${teams.map((t,i)=>`${teamName(i)} : ${t.filter(p=>p.sex==='F').length} F`).join(' · ')}${meta.historyWeeks?` · Rotation analysée sur ${meta.historyWeeks} semaine(s) sauvegardée(s)`:''}</div>
+        <div class="team-grid">${teams.map((team,i)=>{
+          const canEdit=editingTeams && !(meta.mode==='tournoi'&&i===meta.lockedTeam);
+          const groupHtml=sortedPlayers(team).map(p=>{
+            const content=`<span><span class="member-name">${escapeHtml(p.name)}</span><span class="member-position">· ${p.sex==='F'?'Femme':'Homme'}</span></span><span class="member-rating">${playerAverage(p).toFixed(1).replace('.',',')} / 4</span>`;
+            return canEdit?`<button class="member member-pick ${selectedSwap===p.id?'member-selected':''}" type="button" data-swap-id="${escapeHtml(p.id)}" aria-pressed="${selectedSwap===p.id}" aria-label="${escapeHtml(p.name)}, ${teamName(i)}. ${selectedSwap===p.id?'Sélectionné':'Sélectionner pour échange'}">${content}</button>`:`<div class="member">${content}</div>`;
+          }).join('');
+          const level=teamLevels[i];
+          const hue=COLORS[i%COLORS.length];
+          return `<article class="team-card" style="--team-color:${hue[0]};--team-tint:${hue[1]};--team-ink:${TEAM_INK[i%TEAM_INK.length]}"><div class="team-card-head"><div class="team-name-line"><div class="team-title"><span class="team-label">${teamName(i)}</span> ${meta.mode==='tournoi'&&i===meta.lockedTeam?'<span class="team-lock-tag">FIXE</span>':''}</div><span class="team-headcount">${team.length} joueur${team.length>1?'s':''}</span></div><div class="team-avg"><label>Note moyenne pondérée</label><strong>${level.toFixed(2).replace('.',',')} / 4</strong></div><div class="team-meter"><span style="width:${clamp(level/4*100,0,100)}%"></span></div></div><div class="team-members">${groupHtml}</div><div class="team-foot">${team.filter(p=>p.sex==='F').length} femme(s) · ${team.filter(p=>p.sex!=='F').length} homme(s)</div></article>`;
+        }).join('')}</div>
+        <div class="comparison"><h3>Comparatif des équipes</h3><p>Moyennes calculées uniquement sur les joueurs disponibles affectés (notes de 1 à 4).</p><div class="comparison-scroll"><table class="compare-table"><thead><tr><th>Critère</th>${teams.map((_,i)=>`<th>${teamName(i)}</th>`).join('')}<th>Moyenne générale</th></tr></thead><tbody>${state.criteria.map(c=>`<tr><td>${escapeHtml(c.name)} ${c.weight===0?'<span style="color:#a0aba1">(ignoré)</span>':''}</td>${teams.map(t=>{const n=avg(t.map(p=>p.ratings[c.id]||3));return `<td><strong>${n.toFixed(2).replace('.',',')}</strong><div class="compare-bar"><span style="width:${n*25}%"></span></div></td>`}).join('')}<td>${avg(participating.map(p=>p.ratings[c.id]||3)).toFixed(2).replace('.',',')}</td></tr>`).join('')}<tr class="global-row"><td>Note pondérée</td>${teamLevels.map(n=>`<td><strong>${n.toFixed(2).replace('.',',')}</strong></td>`).join('')}<td><strong>${avg(participating.map(playerAverage)).toFixed(2).replace('.',',')}</strong></td></tr></tbody></table></div></div>`;
+    }
+    function renderAll(){renderLogo();renderMetrics();renderPlayers();renderCriteria();renderTournament();renderResults();renderHistory();renderDistribution()}
+
+    function openPlayer(id=null) {
+      editingPlayerId=id;
+      const player=id?state.players.find(p=>p.id===id):null;
+      if(id&&!player)return;
+      el('dialogTitle').textContent=player?'Modifier le joueur':'Ajouter un joueur';
+      el('playerName').value=player?.name || '';
+      el('playerSex').value=player?.sex||'H';
+      el('playerAvailable').value=player?.available===false?'no':'yes';
+      el('playerRatings').innerHTML=state.criteria.map((c,i)=>`<div class="rating-field"><div class="rating-field-head"><label for="rating-${i}">${escapeHtml(c.name)}</label><output class="rating-number" id="rating-output-${i}">${player?.ratings[c.id] || 3} / 4</output></div><input id="rating-${i}" data-rating-id="${escapeHtml(c.id)}" data-rating-index="${i}" type="range" min="1" max="4" step="1" value="${player?.ratings[c.id] || 3}" aria-label="Note ${escapeHtml(c.name)}"></div>`).join('');
+      if(typeof el('playerDialog').showModal==='function')el('playerDialog').showModal();else el('playerDialog').setAttribute('open','');
+      setTimeout(()=>el('playerName').focus(),0);
+    }
+    function closePlayer(){el('playerDialog').close()}
+    function commitPlayer(e) {
+      e.preventDefault();
+      const name=el('playerName').value.trim();
+      if(!name){toast('Saisissez le nom du joueur.',true);el('playerName').focus();return}
+      if(state.players.length>=600&&!editingPlayerId){toast('Limite de 600 joueurs atteinte.',true);return}
+      const ratings={};
+      el('playerRatings').querySelectorAll('input[data-rating-id]').forEach(input=>ratings[input.dataset.ratingId]=clamp(Number(input.value),1,4));
+      const next={id:editingPlayerId||uid(),name:name.slice(0,65),ratings,sex:el('playerSex').value==='F'?'F':'H',available:el('playerAvailable').value==='yes'};
+      if(!next.available)state.lockedIds=state.lockedIds.filter(id=>id!==next.id);
+      if(editingPlayerId){const idx=state.players.findIndex(p=>p.id===editingPlayerId);if(idx>=0)state.players[idx]=next;}
+      else state.players.push(next);
+      closePlayer();changeState();toast(editingPlayerId?'Joueur mis à jour.':'Joueur ajouté.');
+    }
+    function addCriterion(e) {
+      e.preventDefault();const input=el('newCriterion'),name=input.value.trim();
+      if(!name)return;
+      if(state.criteria.length>=12){toast('Maximum de 12 critères.',true);return}
+      if(state.criteria.some(c=>normalize(c.name)===normalize(name))){toast('Ce critère existe déjà.',true);return}
+      const id='crit-'+uid();state.criteria.push({id,name:name.slice(0,34),weight:3});
+      state.players.forEach(p=>p.ratings[id]=3);
+      input.value='';changeState();toast('Critère ajouté avec une note initiale de 3/4 pour chaque joueur.');
+    }
+    function demoRoster() {
+      if(state.players.length && !confirm('Remplacer les joueurs existants par 24 joueurs de démonstration ?'))return;
+      const rows=[
+        ['Camille Martin',4,2,5,3],['Yanis Benali',3,3,4,4],['Hugo Laurent',4,2,5,2],['Noa Petit',3,4,4,4],
+        ['Louise Dubois',4,3,4,5],['Arthur Bernard',3,3,5,3],['Nina Robert',5,3,3,4],
+        ['Sacha Moreau',3,2,5,5],['Eden Lefevre',4,3,5,3],['Mathis Garcia',3,3,4,4],
+        ['Chloé Roux',4,4,4,5],['Rayan Fontaine',3,5,4,3],['Emma Michel',5,4,3,4],['Léo Blanc',4,3,5,4],
+        ['Maya Faure',5,4,2,5],['Adam Vincent',4,5,2,4],
+        ['Inès Garnier',5,4,3,3],['Ethan Chevalier',4,4,3,5],
+        ['Lina François',4,5,4,4],['Jules Legrand',5,3,4,4],
+        ['Sarah Gauthier',4,5,2,4],['Tiago Lambert',3,5,3,5],
+        ['Zoé Girard',5,4,3,4],['Raphaël André',3,4,4,4]
+      ];
+      state.players=rows.map(row=>{
+        const ratings={};const defaultRatings=[row[1],row[2],row[3],row[4]];
+        state.criteria.forEach(c=>{const idx=BASE_CRITERIA.findIndex(b=>b.id===c.id);ratings[c.id]=idx>=0?clamp(Math.round(1+(defaultRatings[idx]-1)*.75),1,4):3});
+        return {id:uid(),name:row[0],ratings,sex:/^(Camille|Louise|Nina|Chloé|Emma|Maya|Inès|Lina|Sarah|Zoé)/.test(row[0])?'F':'H',available:true};
+      });
+      currentSearch='';el('playerSearch').value='';state.lockedIds=[];state.history=[];
+      changeState();toast('24 joueurs de démonstration chargés.');
+    }
+
+    // Les effectifs et la présence féminine sont des contraintes strictes.
+    // L’optimisation recherche d’abord le meilleur niveau, puis renouvelle les associations
+    // sans dégrader les niveaux de plus de 0,012 pt².
+    function balancePlayers(players,nTeams,criteria,lockedTeam,lockedIds,history) {
+      const n=players.length,k=criteria.length,locked=lockedTeam>=0;
+      const fixedSet=new Set(lockedIds);
+      const fixed=players.map((p,i)=>fixedSet.has(p.id)?i:-1).filter(i=>i>=0);
+      const femaleCount=players.filter(p=>p.sex==='F').length;
+      const femaleFloor=Math.floor(femaleCount/nTeams),extraWomen=femaleCount%nTeams;
+      const lockedWomen=fixed.filter(i=>players[i].sex==='F').length;
+      if(locked&&(lockedWomen<femaleFloor||lockedWomen>femaleFloor+(extraWomen?1:0))){
+        throw Error(`L'équipe fixe contient ${lockedWomen} femme(s). Chaque équipe doit en avoir ${femaleFloor}${extraWomen?' ou '+(femaleFloor+1):''}. Modifiez la sélection tournoi.`);
+      }
+      if(locked&&n-fixed.length<nTeams-1)throw Error('En mode tournoi, il faut au moins un joueur disponible dans chacune des autres équipes.');
+      const criterionWeights=criteria.map(c=>Math.max(0,c.weight));
+      const tw=criterionWeights.reduce((a,b)=>a+b,0);
+      const weights=tw?criterionWeights.map(w=>w/tw):criterionWeights.map(()=>1/Math.max(1,k));
+      const pp=players.map(p=>{
+        const ratings=criteria.map(c=>p.ratings[c.id]||3);
+        return {sex:p.sex==='F'?1:0,ratings,strength:ratings.reduce((sum,v,i)=>sum+v*weights[i],0)};
+      });
+      const targets=criteria.map((_,i)=>avg(pp.map(p=>p.ratings[i])));
+      const fixedTeam=locked?lockedTeam:-1;
+      const availableTeams=Array.from({length:nTeams},(_,i)=>i).filter(i=>i!==fixedTeam);
+      const histories=pruneHistory(history);
+      const lookup=new Map(players.map((p,i)=>[p.id,i]));
+      const pairs=new Float32Array(n*n);
+      histories.forEach(h=>{
+        const age=Math.round((parseWeek(weekStart())-parseWeek(h.week))/(7*86400000));
+        const weight=[4,3,2,1][age]||0;
+        h.teams.forEach(team=>{
+          const ids=Array.from(new Set(team.map(m=>lookup.get(m.id)).filter(i=>i!==undefined)));
+          for(let a=0;a<ids.length;a++)for(let b=a+1;b<ids.length;b++){
+            pairs[ids[a]*n+ids[b]]+=weight;pairs[ids[b]*n+ids[a]]+=weight;
+          }
+        });
+      });
+      function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
+      function rand(m){return Math.floor(Math.random()*m)}
+      function layout(){
+        const caps=Array(nTeams).fill(0),free=n-fixed.length;
+        if(locked)caps[fixedTeam]=fixed.length;
+        const base=Math.floor(free/availableTeams.length);
+        availableTeams.forEach(t=>caps[t]=base);
+        shuffle(availableTeams.slice()).slice(0,free%availableTeams.length).forEach(t=>caps[t]++);
+        if(caps.some(cap=>cap===0))return null;
+        const quotas=Array(nTeams).fill(femaleFloor);
+        let remain=extraWomen;
+        if(locked){quotas[fixedTeam]=lockedWomen;if(lockedWomen===femaleFloor+1)remain--;}
+        if(remain<0)return null;
+        const eligible=shuffle(availableTeams.slice());
+        if(eligible.some(t=>caps[t]<femaleFloor))return null;
+        const highCandidates=eligible.filter(t=>caps[t]>=femaleFloor+1);
+        if(highCandidates.length<remain)return null;
+        highCandidates.slice(0,remain).forEach(t=>quotas[t]++);
+        if(quotas.some((q,t)=>q>caps[t]))return null;
+        return {caps,quotas};
+      }
+      const newStats=()=>({n:0,women:0,sums:new Float64Array(k)});
+      function update(st,i,sign){const p=pp[i];st.n+=sign;st.women+=sign*p.sex;for(let c=0;c<k;c++)st.sums[c]+=sign*p.ratings[c];}
+      function teamSkill(st){if(!st.n)return 0;let result=0;for(let c=0;c<k;c++){const d=st.sums[c]/st.n-targets[c];result+=weights[c]*d*d}return result}
+
+      function makeInitial(caps,quotas){
+        const teams=Array.from({length:nTeams},()=>[]),stats=teams.map(newStats);
+        if(locked)fixed.forEach(i=>{teams[fixedTeam].push(i);update(stats[fixedTeam],i,1)});
+        for(const sex of [1,0]){
+          const ids=pp.map((p,i)=>p.sex===sex&&!fixedSet.has(players[i].id)?i:-1).filter(i=>i>=0);
+          shuffle(ids);ids.sort((a,b)=>(pp[b].strength-pp[a].strength)+(Math.random()-.5)*.5);
+          for(const pi of ids){
+            let best=-1,bestValue=Infinity;
+            for(const t of availableTeams){
+              const need=sex?quotas[t]-stats[t].women:(caps[t]-quotas[t])-(stats[t].n-stats[t].women);
+              if(need<=0)continue;
+              const st=stats[t];
+              const combined=st.sums.reduce((s,v,c)=>s+v*weights[c],0)+pp[pi].strength;
+              const desired=(st.n+1)*pp.reduce((s,p)=>s+p.strength,0)/n;
+              const value=(combined-desired)**2/Math.max(1,st.n+1)+Math.random()*.35;
+              if(value<bestValue){bestValue=value;best=t}
+            }
+            if(best<0)throw Error('Impossible de respecter les quotas de femmes et les capacités des équipes.');
+            teams[best].push(pi);update(stats[best],pi,1);
+          }
+        }
+        return {teams,stats};
+      }
+      let bestSkill=Infinity,phaseOneTeams=null,possible=false;
+      const starts=n>180?5:10,iterations=Math.min(5400,Math.max(1400,n*85));
+      for(let start=0;start<starts;start++){
+        const plan=layout();if(!plan)continue;possible=true;
+        const {teams,stats}=makeInitial(plan.caps,plan.quotas);
+        const skills=stats.map(teamSkill);
+        let currentSkill=avg(skills);
+        if(currentSkill<bestSkill-1e-9){
+          bestSkill=currentSkill;phaseOneTeams=teams.map(t=>t.slice());
+        }
+        for(let step=0;step<iterations;step++){
+          const a=availableTeams[rand(availableTeams.length)],b=availableTeams[rand(availableTeams.length)];
+          if(a===b)continue;
+          const ia=rand(teams[a].length),ib=rand(teams[b].length),pa=teams[a][ia],pb=teams[b][ib];
+          if(pp[pa].sex!==pp[pb].sex)continue;
+          update(stats[a],pa,-1);update(stats[a],pb,1);update(stats[b],pb,-1);update(stats[b],pa,1);
+          const la=teamSkill(stats[a]),lb=teamSkill(stats[b]);
+          const next=currentSkill+(la+lb-skills[a]-skills[b])/nTeams;
+          const delta=next-currentSkill,temp=.023*(1-step/iterations)+.0006;
+          if(delta<0||Math.random()<Math.exp(-delta/temp)){
+            [teams[a][ia],teams[b][ib]]=[pb,pa];skills[a]=la;skills[b]=lb;currentSkill=next;
+
+            if(currentSkill<bestSkill-1e-9){
+              bestSkill=currentSkill;phaseOneTeams=teams.map(t=>t.slice());
+            }
+          }else{update(stats[a],pb,-1);update(stats[a],pa,1);update(stats[b],pa,-1);update(stats[b],pb,1)}
+        }
+      }
+      if(!possible||!phaseOneTeams)throw Error('Avec cette équipe fixe, il est impossible de répartir équitablement les femmes. Changez les joueurs verrouillés ou le nombre d’équipes.');
+      // La seconde passe ne sacrifie presque pas l'équilibre des niveaux ; les joueurs
+      // verrouillés restent à leur place et seuls des joueurs du même sexe s'échangent.
+      const teams=phaseOneTeams.map(t=>t.slice()),stats=teams.map(team=>{const st=newStats();team.forEach(i=>update(st,i,1));return st});
+      const skillLosses=stats.map(teamSkill);
+      let currentSkill=avg(skillLosses);
+      const totalPairs=teams.reduce((sum,t)=>sum+t.length*(t.length-1)/2,0)||1;
+      function repeatSum(){let s=0;for(const t of teams)for(let x=0;x<t.length;x++)for(let y=x+1;y<t.length;y++)s+=pairs[t[x]*n+t[y]];return s}
+      let repeats=repeatSum(),bestSecondary=Infinity,answer=teams.map(t=>t.slice());
+      const secondary=r=>r/totalPairs;
+      bestSecondary=secondary(repeats);
+      const secondIterations=Math.min(13000,Math.max(4200,n*90));
+      for(let step=0;step<secondIterations;step++){
+        const a=availableTeams[rand(availableTeams.length)],b=availableTeams[rand(availableTeams.length)];if(a===b)continue;
+        const ia=rand(teams[a].length),ib=rand(teams[b].length),pa=teams[a][ia],pb=teams[b][ib];
+        if(pp[pa].sex!==pp[pb].sex)continue;
+        update(stats[a],pa,-1);update(stats[a],pb,1);update(stats[b],pb,-1);update(stats[b],pa,1);
+        const sa=teamSkill(stats[a]),sb=teamSkill(stats[b]);
+        const nextSkill=currentSkill+(sa+sb-skillLosses[a]-skillLosses[b])/nTeams;
+        if(nextSkill>bestSkill+.012+1e-10){update(stats[a],pb,-1);update(stats[a],pa,1);update(stats[b],pa,-1);update(stats[b],pb,1);continue}
+        let deltaRep=0;
+        for(const other of teams[a])if(other!==pa)deltaRep+=pairs[pb*n+other]-pairs[pa*n+other];
+        for(const other of teams[b])if(other!==pb)deltaRep+=pairs[pa*n+other]-pairs[pb*n+other];
+        const nextRep=repeats+deltaRep;
+        const oldValue=secondary(repeats),newValue=secondary(nextRep);
+        const temp=.012*(1-step/secondIterations)+.00015;
+        if(newValue<oldValue||Math.random()<Math.exp((oldValue-newValue)/temp)){
+          [teams[a][ia],teams[b][ib]]=[pb,pa];
+          skillLosses[a]=sa;skillLosses[b]=sb;
+          currentSkill=nextSkill;repeats=nextRep;
+          if(newValue<bestSecondary-1e-9){bestSecondary=newValue;answer=teams.map(t=>t.slice())}
+        }else{update(stats[a],pb,-1);update(stats[a],pa,1);update(stats[b],pa,-1);update(stats[b],pb,1)}
+      }
+      const selected=answer.map(t=>t.map(i=>players[i].id));
+      const finalRepeat=answer.reduce((sum,t)=>{for(let i=0;i<t.length;i++)for(let j=i+1;j<t.length;j++)sum+=pairs[t[i]*n+t[j]];return sum},0);
+      const fairness=clamp(Math.round(100-35*Math.sqrt(Math.max(0,bestSkill))),0,100);
+      return {teams:selected,fairness,score:bestSkill,repeats:Math.round(finalRepeat),historyWeeks:histories.length};
+    }
+    function generate() {
+      editingTeams=false;selectedSwap=null;swapUndo=null;
+      const eligible=availablePlayers();
+      if(eligible.length<state.teamCount){toast('Il faut au moins un joueur DISPONIBLE par équipe.',true);return}
+      if(!state.criteria.some(c=>c.weight>0)){toast('Activez au moins un critère dans Paramètres.',true);return}
+      const pinned=state.tournamentMode?state.lockedIds.filter(id=>eligible.some(p=>p.id===id)):[];
+      if(state.tournamentMode&&!pinned.length){toast('Mode tournoi : sélectionnez au moins un joueur pour votre équipe fixe.',true);return}
+      try{
+        const result=balancePlayers(eligible,state.teamCount,state.criteria,state.tournamentMode?state.lockedTeam:-1,pinned,state.history);
+        state.lastTeams=result.teams;
+        state.runMeta={fairness:result.fairness,score:result.score,repeatWeight:result.repeats,historyWeeks:result.historyWeeks,mode:state.tournamentMode?'tournoi':'standard',lockedTeam:state.tournamentMode?state.lockedTeam:-1,generatedAt:new Date().toISOString()};
+        changeState(false);el('resultats').scrollIntoView({behavior:'smooth',block:'start'});
+        toast('Équipes générées : femmes équilibrées, indisponibles exclus.');
+      }catch(error){toast(error.message,true)}
+    }
+    function saveWeek() {
+      if(!state.lastTeams)return;
+      const week=weekStart();
+      if(state.history.some(h=>h.week===week)&&!confirm('Remplacer la composition déjà enregistrée cette semaine ?'))return;
+      const records=state.lastTeams.map(team=>team.map(id=>{
+        const player=state.players.find(p=>p.id===id);
+        return {id,name:player?.name||'Joueur inconnu'};
+      }));
+      state.history=pruneHistory([{week,teams:records},...state.history.filter(h=>h.week!==week)]);
+      save();renderHistory();toast('Composition de cette semaine enregistrée.');
+    }
+    function renderTournament() {
+      const active=state.tournamentMode;
+      el('tournamentToggle').checked=active;
+      el('tournamentControls').hidden=!active;
+      if(!active)return;
+      el('tournamentTeam').innerHTML=Array.from({length:state.teamCount},(_,i)=>`<option value="${i}">${teamName(i)}</option>`).join('');
+      el('tournamentTeam').value=String(state.lockedTeam);
+      state.lockedIds=state.lockedIds.filter(id=>availablePlayers().some(p=>p.id===id));
+      const selected=new Set(state.lockedIds),roster=sortedPlayers(availablePlayers()).filter(p=>normalize(p.name).includes(normalize(el('tournamentSearch').value)));
+      el('tournamentRoster').innerHTML=roster.length?roster.map(p=>`<label class="tournament-pick"><input type="checkbox" data-pin="${escapeHtml(p.id)}" ${selected.has(p.id)?'checked':''}><span>${escapeHtml(p.name)}</span><small>${p.sex==='F'?'Femme':'Homme'} · ${totalLabel(playerAverage(p).toFixed(1))}/4</small></label>`).join(''):'<div class="history-empty">Aucun joueur disponible trouvé.</div>';
+      const women=availablePlayers().filter(p=>p.sex==='F').length,low=Math.floor(women/state.teamCount),higher=Math.ceil(women/state.teamCount);
+      const fixedWomen=state.lockedIds.filter(id=>state.players.find(p=>p.id===id)?.sex==='F').length;
+      el('pinnedCount').textContent=state.lockedIds.length;
+      el('tournamentHint').textContent=`${state.lockedIds.length} joueur(s) fixé(s), dont ${fixedWomen} femme(s). Pour respecter la règle, chaque équipe doit contenir ${low}${higher!==low?' ou '+higher:''} femme(s).`;
+    }
+    function renderHistory() {
+      state.history=pruneHistory(state.history);
+      el('historyCount').textContent=state.history.length+' / 4';
+      if(!state.history.length){el('historyContent').innerHTML='<div class="history-empty">Aucune séance enregistrée pour les quatre dernières semaines. Générez des équipes puis cliquez sur « Enregistrer cette semaine » après avoir validé la composition.</div>';return}
+      el('historyContent').innerHTML=`<div class="history-list">${state.history.map(h=>{
+        const weekDate=parseWeek(h.week),label=weekDate.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+        const n=h.teams.reduce((sum,t)=>sum+t.length,0);
+        return `<article class="history-card"><div class="history-card-head"><div><h3>Semaine du ${escapeHtml(label)}</h3><p>${h.teams.length} équipes · ${n} joueurs</p></div><button class="icon-btn danger" type="button" data-delete-week="${escapeHtml(h.week)}" title="Supprimer cette séance" aria-label="Supprimer la semaine du ${escapeHtml(label)}">×</button></div><details><summary>Voir les compositions</summary>${h.teams.map((team,i)=>`<div class="history-team"><b>${teamName(i)}</b> · ${team.length}<div>${escapeHtml(team.map(m=>m.name).join(', '))}</div></div>`).join('')}</details></article>`;
+      }).join('')}</div>`;
+    }
+    function quoteCSV(x){const text=String(x ?? '');return '"'+text.replace(/"/g,'""')+'"'}
+    function download(filename,contents,mime){
+      const blob=new Blob([contents],{type:mime});const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
+    function exportPlayerCSV(){
+      const cols=['Nom','Sexe','Disponible',...state.criteria.map(c=>c.name)];
+      const data=sortedPlayers(state.players).map(p=>[p.name,p.sex==='F'?'Femme':'Homme',p.available?'Oui':'Non',...state.criteria.map(c=>p.ratings[c.id]||3)]);
+      download('rugby-joueurs.csv','\ufeff'+[cols,...data].map(r=>r.map(quoteCSV).join(';')).join('\r\n'),'text/csv;charset=utf-8');
+      toast('Effectif exporté au format CSV.');
+    }
+    function exportTeamCSV(){
+      if(!state.lastTeams)return;
+      const header=['Équipe','Nom','Sexe',...state.criteria.map(c=>c.name),'Note pondérée'];
+      const data=state.lastTeams.flatMap((team,i)=>team.map(id=>{
+        const p=state.players.find(j=>j.id===id);
+        return p?[`${teamName(i)}`,p.name,p.sex==='F'?'Femme':'Homme',...state.criteria.map(c=>p.ratings[c.id]||3),playerAverage(p).toFixed(2).replace('.',',')]:null;
+      }).filter(Boolean));
+      download('rugby-equipes.csv','\ufeff'+[header,...data].map(r=>r.map(quoteCSV).join(';')).join('\r\n'),'text/csv;charset=utf-8');toast('Équipes exportées.');
+    }
+    async function exportTeamsPNG(){
+      if(!state.lastTeams?.length){toast('Générez d’abord vos équipes.',true);return;}
+      const rows=state.lastTeams.map((ids,i)=>({i,players:sortedPlayers(ids.map(id=>state.players.find(p=>p.id===id)).filter(Boolean))}));
+      const cols=rows.length<=2?2:3,cellW=432,gap=21,pad=38,top=156;
+      const width=pad*2+cols*cellW+(cols-1)*gap;
+      const drawing=document.createElement('canvas'),ctx=drawing.getContext('2d');
+      if(!ctx){toast('Export image indisponible dans ce navigateur.',true);return;}
+      ctx.font='23px system-ui, Arial, sans-serif';
+      function wrap(name,maxWidth){
+        const words=name.split(/\s+/);let lines=[],line='';
+        for(const word of words){
+          const attempt=line?line+' '+word:word;
+          if(ctx.measureText(attempt).width>maxWidth && line){lines.push(line);line=word}else line=attempt;
+        }
+        if(line)lines.push(line);
+        return lines.length?lines:[''];
+      }
+      const boxes=rows.map(({i,players})=>({i,players,names:players.map(p=>wrap(p.name,cellW-58))}));
+      const rowCount=Math.ceil(boxes.length/cols);
+      const heights=[];
+      for(let r=0;r<rowCount;r++){
+        const block=boxes.slice(r*cols,(r+1)*cols);
+        heights.push(Math.max(...block.map(x=>84+Math.max(1,x.names.reduce((a,line)=>a+Math.max(1,line.length),0))*30+25)));
+      }
+      const height=top+heights.reduce((a,b)=>a+b,0)+Math.max(0,rowCount-1)*gap+83;
+      // High resolution export. Content is strictly names and counts; no numerical ratings.
+      const scale=2;drawing.width=width*scale;drawing.height=height*scale;
+      ctx.scale(scale,scale);
+      const rect=(x,y,w,h,r,fill,stroke)=>{
+        ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();
+        if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();}
+      };
+      ctx.fillStyle='#f4f4f6';ctx.fillRect(0,0,width,height);
+      rect(0,0,width,108,0,'#17171b');
+      let titleLeft=pad;
+      if(state.logoDataUrl){
+        try{
+          const im=new Image();im.src=state.logoDataUrl;
+          await new Promise((resolve,reject)=>{if(im.complete&&im.naturalWidth)return resolve();im.onload=resolve;im.onerror=reject});
+          const ratio=Math.min(76/im.naturalWidth,76/im.naturalHeight);
+          ctx.drawImage(im,pad,15,im.naturalWidth*ratio,im.naturalHeight*ratio);
+          titleLeft=pad+96;
+        }catch(_){}
+      }
+      ctx.fillStyle='#fff';ctx.font='bold 34px system-ui, Arial, sans-serif';ctx.fillText('USMV touché',titleLeft,49);
+      ctx.font='17px system-ui, Arial, sans-serif';ctx.fillStyle='#d9d9de';ctx.fillText('Composition des équipes',titleLeft,76);
+      ctx.fillStyle='#494951';ctx.font='15px system-ui, Arial, sans-serif';
+      ctx.fillText(new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})+'  ·  '+boxes.length+' équipes',pad,136);
+      let y=top;
+      for(let r=0;r<rowCount;r++){
+        const block=boxes.slice(r*cols,(r+1)*cols);
+        for(let col=0;col<block.length;col++){
+          const t=block[col],x=pad+col*(cellW+gap),h=heights[r],color=COLORS[t.i%COLORS.length][0];
+          rect(x,y,cellW,h,16,'#fff','#e2e2e6');
+          rect(x+1,y+1,cellW-2,63,[15,15,0,0],color);
+          ctx.fillStyle=TEAM_INK[t.i%TEAM_INK.length];ctx.font='bold 25px system-ui, Arial, sans-serif';ctx.fillText(teamName(t.i),x+19,y+39);
+          ctx.font='bold 14px system-ui, Arial, sans-serif';ctx.textAlign='right';ctx.fillText(t.players.length+' joueurs',x+cellW-18,y+37);ctx.textAlign='left';
+          let lineY=y+91;
+          t.names.forEach((lines,j)=>{
+            ctx.fillStyle='#242429';ctx.font='20px system-ui, Arial, sans-serif';
+            lines.forEach(line=>{ctx.fillText(line,x+23,lineY);lineY+=30});
+            if(j<t.names.length-1){ctx.fillStyle='#e9e9ec';ctx.fillRect(x+23,lineY-12,cellW-46,1)}
+          });
+        }
+        y+=heights[r]+gap;
+      }
+      ctx.font='13px system-ui, Arial, sans-serif';ctx.fillStyle='#71717b';ctx.fillText('USMV touché · Composition prête à partager',pad,height-34);
+      const blob=await new Promise(resolve=>drawing.toBlob(resolve,'image/png'));
+      if(!blob){toast('Impossible de produire le PNG.',true);return;}
+      const url=URL.createObjectURL(blob),a=document.createElement('a');
+      a.href=url;a.download='USMV-touche-equipes-'+new Date().toISOString().slice(0,10)+'.png';
+      document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);
+      toast('Image PNG téléchargée, sans notes individuelles ni moyennes.');
+    }
+
+    function parseDelimited(text) {
+      const firstLine=text.split(/\r?\n/,1)[0];
+      const semi=(firstLine.match(/;/g)||[]).length,comma=(firstLine.match(/,/g)||[]).length,tab=(firstLine.match(/\t/g)||[]).length;
+      const sep=semi>=comma&&semi>=tab?';':tab>comma?'\t':',';
+      const rows=[];let row=[],field='',quoted=false;
+      for(let i=0;i<text.length;i++){
+        const ch=text[i];
+        if(ch==='"'){if(quoted&&text[i+1]==='"'){field+='"';i++}else quoted=!quoted;}
+        else if(ch===sep&&!quoted){row.push(field);field=''}
+        else if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(field);if(row.some(x=>x.trim()))rows.push(row);row=[];field=''}
+        else field+=ch;
+      }
+      row.push(field);if(row.some(x=>x.trim()))rows.push(row);
+      return rows;
+    }
+
+    function importCSV(text) {
+      const rows=parseDelimited(text.replace(/^\ufeff/,''));
+      if(!rows.length)throw new Error('Le CSV est vide.');
+      const header=rows[0].map(normalize);
+      const hasHeader=header.some(h=>['nom','joueur','nomdujoueur','prenom'].includes(h));
+      const nameIx=hasHeader?Math.max(0,header.findIndex(h=>['nom','joueur','nomdujoueur','nomprenom','prenom'].includes(h))):0;
+      const first=hasHeader?1:0;
+      const sexIx=hasHeader?header.findIndex(h=>['sexe','genre','sex'].includes(h)):1;
+      const availableIx=hasHeader?header.findIndex(h=>['disponible','disponibilite','available','presence'].includes(h)):2;
+      let added=0;
+      for(let i=first;i<rows.length&&state.players.length<600;i++){
+        const row=rows[i],name=(row[nameIx]||'').trim().slice(0,65);if(!name)continue;
+        const ratings={};
+        state.criteria.forEach((c,j)=>{
+          let idx=hasHeader?header.indexOf(normalize(c.name)):j+3;
+          if(idx<0)idx=-1;
+          const value=idx>=0?Number(String(row[idx]||'').trim().replace(',','.')):NaN;
+          ratings[c.id]=Number.isFinite(value)&&value>=1&&value<=4?Math.round(value):3;
+        });
+        const sex=sexIx>=0&&['f','femme','female'].includes(normalize(row[sexIx]))?'F':'H';
+        const avail=availableIx<0||!['non','no','false','0','indisponible','absent'].includes(normalize(row[availableIx]));
+        state.players.push({id:uid(),name,ratings,sex,available:avail});added++;
+      }
+      if(!added)throw new Error('Aucun joueur valide détecté. Utilisez une colonne « Nom ».');
+      changeState();toast(`${added} joueur${added>1?'s':''} importé${added>1?'s':''} depuis le CSV.`);
+    }
+    async function handleImport(e) {
+      const file=e.target.files?.[0];
+      e.target.value='';if(!file)return;
+      try {
+        if(file.size>2*1024*1024)throw new Error('Le fichier doit faire moins de 2 Mo.');
+        const text=await file.text();
+        if(/\.json$/i.test(file.name)){
+          const raw=JSON.parse(text),newState=safeState(raw);
+          if(!confirm('Importer cette sauvegarde JSON ? Votre effectif et vos critères actuels seront remplacés.'))return;
+          state=newState;currentSearch='';el('playerSearch').value='';changeState(false);toast('Sauvegarde JSON restaurée.');
+        } else importCSV(text);
+      } catch(error){toast('Import impossible : '+error.message,true)}
+    }
+
+    el('tournamentToggle').addEventListener('change',e=>{state.tournamentMode=e.target.checked;changeState()});
+    el('tournamentTeam').addEventListener('change',e=>{state.lockedTeam=Number(e.target.value);changeState()});
+    el('tournamentSearch').addEventListener('input',()=>renderTournament());
+    el('tournamentRoster').addEventListener('change',e=>{
+      if(!e.target.matches('[data-pin]'))return;
+      const id=e.target.dataset.pin;
+      if(e.target.checked&&!state.lockedIds.includes(id))state.lockedIds.push(id);
+      if(!e.target.checked)state.lockedIds=state.lockedIds.filter(x=>x!==id);
+      changeState();
+    });
+    el('historyContent').addEventListener('click',e=>{
+      const button=e.target.closest('[data-delete-week]');if(!button)return;
+      if(!confirm('Supprimer cette semaine de l’historique ?'))return;
+      state.history=state.history.filter(h=>h.week!==button.dataset.deleteWeek);save();renderHistory();toast('Semaine supprimée de l’historique.');
+    });
+    el('addPlayer').addEventListener('click',()=>openPlayer());
+    el('closeDialog').addEventListener('click',closePlayer);
+    el('cancelDialog').addEventListener('click',closePlayer);
+    el('playerForm').addEventListener('submit',commitPlayer);
+    el('playerRatings').addEventListener('input',e=>{
+      if(e.target.matches('[data-rating-index]'))el('rating-output-'+e.target.dataset.ratingIndex).textContent=e.target.value+' / 4';
+    });
+    el('playerDialog').addEventListener('click',e=>{if(e.target===el('playerDialog'))closePlayer()});
+    el('playerSearch').addEventListener('input',e=>{currentSearch=e.target.value;renderPlayers()});
+    el('playersTableContainer').addEventListener('click',e=>{
+      const sorter=e.target.closest('[data-sort]');
+      if(sorter){
+        const key=sorter.dataset.sort;
+        if(!['name','sex','rating','available'].includes(key))return;
+        if(playerSort.key===key)playerSort.dir*=-1;
+        else playerSort={key,dir:1};
+        renderPlayers();return;
+      }
+      const button=e.target.closest('[data-action]');if(!button)return;
+      if(button.dataset.action==='demo'){demoRoster();return}
+      const player=state.players.find(p=>p.id===button.dataset.id);if(!player)return;
+      if(button.dataset.action==='edit')openPlayer(player.id);
+      if(button.dataset.action==='toggle'){player.available=!player.available;if(!player.available)state.lockedIds=state.lockedIds.filter(id=>id!==player.id);changeState();toast(player.name+(player.available?' est disponible.':' est indisponible.'));}
+      if(button.dataset.action==='delete'&&confirm(`Supprimer ${player.name} de l’effectif ?`)){
+        state.players=state.players.filter(p=>p.id!==player.id);state.lockedIds=state.lockedIds.filter(id=>id!==player.id);changeState();toast('Joueur supprimé.');
+      }
+    });
+    el('addCriterionForm').addEventListener('submit',addCriterion);
+    el('criteriaList').addEventListener('input',e=>{
+      if(e.target.matches('[data-criterion]')){
+        const out=el('weight-out-'+e.target.dataset.index);if(out)out.textContent=e.target.value+' / 4';
+      }
+    });
+    el('criteriaList').addEventListener('change',e=>{
+      if(!e.target.matches('[data-criterion]'))return;
+      const criterion=state.criteria.find(c=>c.id===e.target.dataset.criterion);
+      if(criterion){criterion.weight=Number(e.target.value);changeState()}
+    });
+    el('criteriaList').addEventListener('click',e=>{
+      const button=e.target.closest('button[data-action]');if(!button)return;
+      const c=state.criteria.find(c=>c.id===button.dataset.id);if(!c)return;
+      if(button.dataset.action==='rename'){
+        const value=prompt('Nouveau nom du critère :',c.name);
+        if(value===null)return;const next=value.trim().slice(0,34);
+        if(!next){toast('Le nom ne peut pas être vide.',true);return}
+        if(state.criteria.some(other=>other.id!==c.id&&normalize(other.name)===normalize(next))){toast('Ce nom est déjà utilisé.',true);return}
+        c.name=next;changeState();toast('Critère renommé.');
+      } else if(button.dataset.action==='remove'){
+        if(state.criteria.length<=1){toast('Gardez au moins un critère.',true);return}
+        if(!confirm(`Supprimer le critère « ${c.name} » et ses notes ?`))return;
+        state.criteria=state.criteria.filter(x=>x.id!==c.id);
+        state.players.forEach(p=>delete p.ratings[c.id]);changeState();toast('Critère supprimé.');
+      }
+    });
+    el('addTeam').addEventListener('click',()=>{state.teamCount=clamp(state.teamCount+1,2,12);changeState()});
+    el('removeTeam').addEventListener('click',()=>{state.teamCount=clamp(state.teamCount-1,2,12);state.lockedTeam=Math.min(state.lockedTeam,state.teamCount-1);changeState()});
+    el('generateHero').addEventListener('click',generate);
+    el('loadDemoHero').addEventListener('click',demoRoster);
+    el('resultButtons').addEventListener('click',e=>{
+      const b=e.target.closest('[data-result]');if(!b)return;
+      if(b.dataset.result==='edit'){
+        editingTeams=!editingTeams;selectedSwap=null;
+        if(!editingTeams)swapUndo=null;
+        renderResults();
+      }else if(b.dataset.result==='undo'){
+        if(!swapUndo)return;
+        state.lastTeams=swapUndo.teams.map(t=>t.slice());
+        state.runMeta={...swapUndo.meta};
+        swapUndo=null;selectedSwap=null;changeState(false);
+        toast('Dernier échange annulé.');
+      }else if(b.dataset.result==='csv')exportTeamCSV();else if(b.dataset.result==='png')exportTeamsPNG();else if(b.dataset.result==='again')generate();else if(b.dataset.result==='save-week')saveWeek();
+    });
+    el('resultsContent').addEventListener('click',e=>{
+      const button=e.target.closest('[data-swap-id]');
+      if(button)swapPlayers(button.dataset.swapId);
+    });
+    el('statsAvailableOnly').addEventListener('change',renderDistribution);
+    el('distributionGrid').addEventListener('click',e=>{
+      const link=e.target.closest('button[data-edit-player]');
+      if(link)openPlayer(link.dataset.editPlayer);
+    });
+    el('clearPlayers').addEventListener('click',()=>{
+      if(!state.players.length){toast('Votre effectif est déjà vide.');return}
+      if(!confirm('Supprimer tous les joueurs et les équipes générées ?'))return;
+      state.players=[];state.lockedIds=[];currentSearch='';el('playerSearch').value='';changeState();toast('Effectif vidé.');
+    });
+    el('exportPlayers').addEventListener('click',exportPlayerCSV);
+    el('exportBackup').addEventListener('click',()=>{
+      download('rugby-sauvegarde.json',JSON.stringify(state,null,2),'application/json;charset=utf-8');toast('Sauvegarde JSON téléchargée.');
+    });
+    el('importButton').addEventListener('click',()=>el('importFile').click());
+    el('importFile').addEventListener('change',handleImport);
+    function renderLogo(){
+      const image=el('clubLogo'),placeholder=el('brandPlaceholder');
+      const has=!!state.logoDataUrl;
+      if(has)image.src=state.logoDataUrl;
+      else image.removeAttribute('src');
+      image.hidden=!has;placeholder.hidden=has;
+      el('brandmark').classList.toggle('has-logo',has);
+      el('chooseLogo').textContent=has?'Changer logo':'+ logo';
+    }
+    el('chooseLogo').addEventListener('click',()=>el('logoFile').click());
+    el('logoFile').addEventListener('change',async e=>{
+      const file=e.target.files?.[0];e.target.value='';if(!file)return;
+      if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>4*1024*1024){toast('Utilisez un logo PNG, JPG ou WebP de moins de 4 Mo.',true);return;}
+      let url='';
+      try{
+        url=URL.createObjectURL(file);
+        const img=new Image();
+        await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url});
+        const canvas=document.createElement('canvas');
+        const ratio=Math.min(1,500/Math.max(img.naturalWidth,img.naturalHeight));
+        canvas.width=Math.max(1,Math.round(img.naturalWidth*ratio));
+        canvas.height=Math.max(1,Math.round(img.naturalHeight*ratio));
+        canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+        state.logoDataUrl=canvas.toDataURL('image/png');
+        if(state.logoDataUrl.length>800000)throw new Error('Le logo est trop volumineux. Choisissez une image plus simple.');
+        save();renderLogo();toast('Logo enregistré. Il sera réutilisé automatiquement.');
+      }catch(error){toast('Logo non importé : '+error.message,true)}finally{if(url)URL.revokeObjectURL(url)}
+    });
+
+    function setTab(tab){
+      const settings=tab==='settings';
+      el('mainView').hidden=settings;el('settingsView').hidden=!settings;
+      el('tabTeams').classList.toggle('active',!settings);
+      el('tabSettings').classList.toggle('active',settings);
+      el('tabTeams').setAttribute('aria-selected',String(!settings));
+      el('tabSettings').setAttribute('aria-selected',String(settings));
+      if(settings)el('settingsView').scrollIntoView({block:'start'});
+      else window.scrollTo({top:0,behavior:'smooth'});
+    }
+    el('tabTeams').addEventListener('click',()=>setTab('teams'));
+    el('tabSettings').addEventListener('click',()=>setTab('settings'));
+    el('backToTeams').addEventListener('click',()=>setTab('teams'));
+    el('cloudPassword').addEventListener('click',()=>{
+      el('passwordError').textContent='';
+      el('passwordNext').value='';el('passwordConfirm').value='';
+      el('passwordDialog').showModal();
+    });
+    el('passwordClose').addEventListener('click',()=>el('passwordDialog').close());
+    el('passwordForm').addEventListener('submit',async event=>{
+      event.preventDefault();
+      const next=el('passwordNext').value;
+      if(next!==el('passwordConfirm').value){el('passwordError').textContent='Les deux mots de passe ne sont pas identiques.';return;}
+      if(next.length<10){el('passwordError').textContent='Le mot de passe doit comporter au moins 10 caractères.';return;}
+      el('passwordSave').disabled=true;
+      try{
+        const {error}=await cloudClient.auth.updateUser({password:next});
+        if(error)throw error;
+        el('passwordDialog').close();toast('Mot de passe modifié.');
+      }catch(error){el('passwordError').textContent=error.message||'Impossible de changer le mot de passe.'}
+      finally{el('passwordSave').disabled=false}
+    });
+    el('authForm').addEventListener('submit',cloudSignIn);
+    el('authSignup').addEventListener('click',cloudSignUp);
+    el('cloudLogout').addEventListener('click',cloudSignOut);
+    el('authLogout').addEventListener('click',cloudSignOut);
+    el('cloudRefresh').addEventListener('click',()=>refreshCloud());
+    el('syncReload').addEventListener('click',async()=>{
+      if((cloudDirty||cloudConflict||pendingCacheAtLogin||cloudSaving)&&!confirm('Charger la version serveur et abandonner les modifications locales non synchronisees ? Exportez d’abord votre copie JSON.'))return;
+      if(cloudSaving){toast('Attendez la fin de la synchronisation avant de recharger.',true);return}
+      await refreshCloud(true);
+    });
+    el('syncExport').addEventListener('click',exportJSONCopy);
+    el('syncRetry').addEventListener('click',()=>{
+      cloudRetry=false;clearSyncAlert();cloudStatus('Nouvelle tentative...','pending');
+      if(cloudDirty)flushCloud();else refreshCloud();
+    });
+    window.addEventListener('focus',()=>{if(cloudReady&&!cloudSaving&&!cloudDirty&&!cloudConflict)refreshCloud()});
+    window.addEventListener('online',()=>{if(cloudReady&&!cloudSaving&&!cloudConflict&&cloudDirty)flushCloud()});
+    renderAll();initCloud();
+  })();
+  </script>
+</body>
+</html>
