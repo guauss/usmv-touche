@@ -503,8 +503,8 @@
     // CONFIGURATION V6 - RENSEIGNEZ URL ET CLE PUBLIABLE AVANT PUBLICATION.
     // N'utilisez JAMAIS de cle sb_secret_ ou service_role dans le HTML.
     // ================================================================
-    const SUPABASE_URL = 'https://dhqseavsswufmpsjprkp.supabase.co';
-    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_SXBcCssROmTEyjwJQkMVyg_WA_4DIbT';
+    const SUPABASE_URL = 'https://VOTRE-PROJET.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'COLLER_LA_CLE_PUBLISHABLE_ICI';
     const USMV_CLUB_ID = 'd3258ab5-0270-4cde-940e-8c7b46608e71';
     // ================================================================
     const STORE = 'usmv-touche-local-v6';
@@ -1250,7 +1250,8 @@
     async function exportTeamsPNG(){
       if(!state.lastTeams?.length){toast('Générez d’abord vos équipes.',true);return;}
       const rows=state.lastTeams.map((ids,i)=>({i,players:sortedPlayers(ids.map(id=>state.players.find(p=>p.id===id)).filter(Boolean))}));
-      const cols=rows.length<=2?2:3,cellW=432,gap=21,pad=38,top=156;
+      // Export portrait : une seule colonne, chaque equipe sous la precedente.
+      const cols=1,cellW=536,gap=20,pad=32,top=156;
       const width=pad*2+cols*cellW+(cols-1)*gap;
       const drawing=document.createElement('canvas'),ctx=drawing.getContext('2d');
       if(!ctx){toast('Export image indisponible dans ce navigateur.',true);return;}
@@ -1273,7 +1274,7 @@
       }
       const height=top+heights.reduce((a,b)=>a+b,0)+Math.max(0,rowCount-1)*gap+83;
       // High resolution export. Content is strictly names and counts; no numerical ratings.
-      const scale=2;drawing.width=width*scale;drawing.height=height*scale;
+      const scale=Math.min(2,16000/height);drawing.width=Math.ceil(width*scale);drawing.height=Math.ceil(height*scale);
       ctx.scale(scale,scale);
       const rect=(x,y,w,h,r,fill,stroke)=>{
         ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();
