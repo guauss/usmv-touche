@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#171719">
   <meta name="description" content="USMV touché : constituez et partagez des équipes équilibrées avec la synchronisation sécurisée Supabase.">
-  <title>USMV touché - Gestion de l'effectif</title>
+  <title>USMV touch&#233; - Gestion de l'effectif | V1.1</title>
   <style>
     :root {
       --ink:#171719; --ink-light:#97152b; --forest:#171719; --forest2:#97152b;
@@ -345,6 +345,37 @@
     .password-form input{width:100%;padding:12px;border:1px solid #d8d8de;border-radius:10px}
     @media(max-width:650px){.cloud-bar{padding:10px;align-items:flex-start}.cloud-user{max-width:170px}.auth-card{padding:19px}.auth-header h2{font-size:17px}.sync-alert{padding:10px}}
 
+
+    /* V1.1 : invites ephemeres, deux groupes tournoi, transferts directs */
+    .guest-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+    .guest-list{display:flex;flex-direction:column;gap:7px;margin-top:12px}
+    .guest-entry{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#f8f8fa;border:1px solid #ededf0;border-radius:11px;padding:9px 10px}
+    .guest-person{font-size:12px;font-weight:850;color:#202028;overflow-wrap:anywhere}
+    .guest-person small{display:block;font-size:10px;color:#71717a;font-weight:650;margin-top:3px}
+    .guest-controls{display:flex;align-items:center;gap:4px}
+    .guest-mark{display:inline-flex;align-items:center;margin-left:6px;font-size:9px;font-weight:850;background:#fff0df;color:#a45112;border-radius:6px;padding:3px 6px;vertical-align:middle}
+    .guest-empty{padding:12px;color:#777780;background:#fafafa;border:1px dashed #e4e4e7;border-radius:10px;font-size:11px;line-height:1.5}
+    .tournament-lock{margin-top:12px;border:1px solid #e1e1e6;border-radius:12px;overflow:hidden;background:#fff}
+    .tournament-lock.is-off{opacity:.66}
+    .tournament-lock-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px;background:#f7f7f9}
+    .tournament-lock-head.red{border-left:5px solid #d51d37}
+    .tournament-lock-head.yellow{border-left:5px solid #f4cb13}
+    .tournament-lock-head strong{font-size:12px;letter-spacing:-.1px}
+    .tournament-lock-head small{display:block;font-size:10px;color:#797980;margin-top:3px}
+    .tournament-lock-body{padding:10px 12px 12px}
+    .compact-check{display:flex;align-items:center;gap:8px;color:#33333a;font-size:11px;font-weight:750;cursor:pointer}
+    .compact-check input{width:16px;height:16px;flex-shrink:0}
+    .tournament-lock .tournament-roster{max-height:164px;margin-top:8px}
+    .tournament-pick[aria-disabled="true"]{opacity:.56;cursor:not-allowed}
+    .tournament-pick small{max-width:115px}
+    .tournament-hint{margin-top:12px;background:#fff0f2;border-radius:9px;padding:11px;color:#752036;font-size:10px;line-height:1.6}
+    .edit-helper .compact-check{color:#f9f9fb;margin-top:10px}
+    .member-edit-row{border-bottom:1px solid #ededf0;padding-bottom:8px}
+    .member-edit-row>.member{border-bottom:0}
+    .member-edit-row>.move-target{margin-top:2px}
+    .move-target{display:block;width:100%;padding:8px 10px;border:1px solid #e9cad0;border-radius:8px;background:#fff8f9;color:#912037;font-size:11px;cursor:pointer}
+    .team-card .member-edit-row:last-child{border-bottom:0}
+    @media(max-width:650px){.tournament-lock-head{padding:10px}.guest-entry{padding:8px}.move-target{min-height:36px}}
 </style>
 </head>
 <body class="cloud-locked">
@@ -355,7 +386,7 @@
           <img id="clubLogo" alt="Logo du club USMV touché" hidden>
           <svg id="brandPlaceholder" width="25" height="25" viewBox="0 0 26 26" fill="none" aria-hidden="true"><path d="M3.6 17.6C2 12 8.6 3.2 19.5 3.3c4.8 10.5-3.7 19.3-15.9 14.3Z" stroke="currentColor" stroke-width="1.8"/><path d="M7.5 18.9C10 12.1 14.6 7.7 19.5 6.5M10.1 15.7l4.5 3M12.7 12.6l4 2.7M15.2 9.7l3.5 2.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
         </div>
-        <div class="brandtext">USMV touché <span>- Gestion de l'effectif</span></div>
+        <div class="brandtext">USMV touch&#233; <span>Gestion de l'effectif &middot; V1.1</span></div>
       </a>
       <button class="logo-upload" type="button" id="chooseLogo" title="Importer ou remplacer le logo du club" aria-label="Importer le logo du club">+ logo</button>
       <input id="logoFile" type="file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" class="sr-only" aria-label="Choisir un logo">
@@ -405,19 +436,23 @@
           <div class="panel-footer"><span class="footnote">Notes de 1 à 4 · Cliquez sur les titres de colonnes pour trier · Sauvegarde automatique.</span><div class="panel-controls"><button class="text-button" id="exportBackup" type="button">Sauvegarde JSON ↓</button><button class="text-button" id="clearPlayers" type="button" style="color:#a06761">Vider l'effectif</button></div></div>
         </section>
 
-        <aside class="config-stack" aria-label="Mode tournoi">
+        <aside class="config-stack" aria-label="Invit&eacute;s et mode tournoi">
           <section class="panel"><div class="panel-body">
-            <div class="panel-heading"><div class="heading-left"><div class="heading-icon">🏆</div><div><h2>Mode tournoi</h2><p class="subheading">Composez une équipe fixe, équilibrez les autres.</p></div></div></div>
-            <label class="toggle-row" for="tournamentToggle"><span><strong>Activer le mode tournoi</strong><small>L'équipe sélectionnée ne recevra aucun autre joueur.</small></span><input id="tournamentToggle" type="checkbox"></label>
+            <div class="panel-heading"><div class="heading-left"><div class="heading-icon">&#129309;</div><div><h2>Invit&eacute;s ponctuels <span id="guestCount" class="count-chip">0</span></h2><p class="subheading">Pour cette s&eacute;ance, sans ajout &agrave; l'effectif.</p></div></div></div>
+            <div class="guest-head"><button id="addGuest" type="button" class="btn btn-solid btn-small">+ Ajouter un invit&eacute;</button><button id="clearGuests" type="button" class="text-button">Vider les invit&eacute;s</button></div>
+            <div id="guestRoster" class="guest-list"></div>
+            <p class="hint">Les invit&eacute;s participent aux &eacute;quipes et aux exports. Ils restent s&eacute;par&eacute;s de l'effectif du club et peuvent &ecirc;tre retir&eacute;s apr&egrave;s la s&eacute;ance.</p>
+          </div></section>
+          <section class="panel"><div class="panel-body">
+            <div class="panel-heading"><div class="heading-left"><div class="heading-icon">&#127942;</div><div><h2>Mode tournoi</h2><p class="subheading">Jusqu'&agrave; deux &eacute;quipes fixes : Rouge et Jaune.</p></div></div></div>
+            <label class="toggle-row" for="tournamentToggle"><span><strong>Activer le mode tournoi</strong><small>Composez les &eacute;quipes tournoi, puis &eacute;quilibrez les autres.</small></span><input id="tournamentToggle" type="checkbox"></label>
             <div id="tournamentControls" hidden>
-              <div class="form-field" style="margin:16px 0 11px"><label for="tournamentTeam">Équipe à composer manuellement</label><select id="tournamentTeam" class="inline-select"></select></div>
-              <div class="field-title">Joueurs verrouillés <span id="pinnedCount" class="count-chip">0</span></div>
-              <p class="field-help">Cochez les joueurs disponibles que vous souhaitez affecter à cette équipe. Leur niveau n'est pas modifié.</p>
-              <label class="searchbar tournament-search"><span class="sr-only">Chercher dans la liste tournoi</span><input id="tournamentSearch" type="search" placeholder="Filtrer les joueurs disponibles…"></label>
-              <div id="tournamentRoster" class="tournament-roster"></div>
-              <div id="tournamentHint" class="hint"></div>
+              <label class="searchbar tournament-search"><span class="sr-only">Chercher des joueurs pour le tournoi</span><input id="tournamentSearch" type="search" placeholder="Filtrer les joueurs et invit&eacute;s..."></label>
+              <div id="tournamentLocksContainer"></div>
+              <div id="tournamentHint" class="tournament-hint" role="status"></div>
             </div>
-          </div></section>        </aside>
+          </div></section>
+        </aside>
       </div>
 
       <section class="panel results-panel" id="resultats" aria-labelledby="results-heading">
@@ -439,9 +474,9 @@
             <div class="panel-heading"><div class="heading-left"><div class="heading-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 17h16M8 4v6M16 14v6"/></svg></div><div><h2>Critères d'équilibrage</h2><p class="subheading">Chaque critère est noté sur 4.</p></div></div></div>
             <div id="criteriaList" class="criterion-list"></div>
             <form id="addCriterionForm" class="criterion-add"><label class="sr-only" for="newCriterion">Nom du nouveau critère</label><input id="newCriterion" maxlength="34" placeholder="Ex. Jeu au pied, défense…" required><button class="btn btn-solid btn-small" type="submit" title="Ajouter le critère">+ Ajouter</button></form>
-            <p class="hint">Chaque joueur est noté de 1 à 4. La priorité de chaque critère se règle de 0 à 4 (0 = critère ignoré). La répartition femmes/hommes reste obligatoire.</p>
+            <p class="hint">Chaque joueur est noté de 1 à 4. La priorité de chaque critère se règle de 0 à 4 (0 = critère ignoré). Hors tournoi, la répartition des femmes est &eacute;quitable par d&eacute;faut. Les ajustements peuvent l'assouplir.</p>
           </div></section>
-          <aside class="settings-help"><h3>Comment fonctionne l'équilibrage ?</h3><p>Les joueurs sont notés de <strong>1 à 4</strong> pour chaque critère. Sa pondération va également de <strong>0 à 4</strong>.</p><p>La disponibilité et la répartition équitable des femmes sont obligatoires. L'algorithme privilégie ensuite l'équilibre des niveaux, puis la diversité des coéquipiers sur les quatre dernières semaines.</p><button class="btn btn-solid" id="backToTeams" type="button">← Retour aux équipes</button></aside>
+          <aside class="settings-help"><h3>Comment fonctionne l'équilibrage ?</h3><p>Les joueurs sont notés de <strong>1 à 4</strong> pour chaque critère. Sa pondération va également de <strong>0 à 4</strong>.</p><p>La disponibilité est obligatoire. Hors tournoi, les femmes sont réparties équitablement. En tournoi, les &eacute;quipes fixes peuvent &ecirc;tre sans femmes. L'algorithme privilégie ensuite l'équilibre des niveaux, puis la diversité des coéquipiers sur les quatre dernières semaines.</p><button class="btn btn-solid" id="backToTeams" type="button">← Retour aux équipes</button></aside>
         </div>
         <section class="panel distribution-panel" aria-labelledby="distributionTitle">
           <div class="panel-body">
@@ -455,7 +490,7 @@
         </section>
       </section>
     </main>
-    <footer class="bottom-note"><span><strong>USMV touché</strong> · Gestion de l’effectif et des équipes.</span><span>Données sauvegardées dans Supabase et accessibles aux membres autorisés.</span></footer>
+    <footer class="bottom-note"><span><strong>USMV touché</strong> · Gestion de l’effectif et des équipes.</span><span>Version 1.1 &middot; Donn&eacute;es partag&eacute;es via Supabase.</span></footer>
   </div>
 
   <section class="auth-overlay" id="authOverlay" role="dialog" aria-modal="true" aria-labelledby="authTitle">
@@ -488,8 +523,8 @@
   <dialog id="playerDialog" aria-labelledby="dialogTitle">
     <form id="playerForm" novalidate>
       <div class="modal-head"><div><div class="modal-title" id="dialogTitle">Ajouter un joueur</div><div class="modal-sub">Chaque note va de 1 (débutant) à 4 (excellent).</div></div><button class="icon-btn" type="button" id="closeDialog" aria-label="Fermer">✕</button></div>
-      <div class="modal-body"><div class="form-field"><label for="playerName">Nom du joueur *</label><input id="playerName" type="text" maxlength="65" required autocomplete="off" placeholder="Ex. Camille Martin"></div>
-        <div class="modal-form-row"><div class="form-field"><label for="playerSex">Sexe</label><select id="playerSex"><option value="H">Homme</option><option value="F">Femme</option></select></div><div class="form-field"><label for="playerAvailable">Disponibilité</label><select id="playerAvailable"><option value="yes">Disponible</option><option value="no">Indisponible</option></select></div></div>
+      <div class="modal-body"><div class="form-field"><label for="playerName" id="playerNameLabel">Nom du joueur *</label><input id="playerName" type="text" maxlength="65" required autocomplete="off" placeholder="Ex. Camille Martin"></div>
+        <div class="modal-form-row"><div class="form-field"><label for="playerSex">Sexe</label><select id="playerSex"><option value="H">Homme</option><option value="F">Femme</option></select></div><div class="form-field" id="playerAvailableField"><label for="playerAvailable">Disponibilité</label><select id="playerAvailable"><option value="yes">Disponible</option><option value="no">Indisponible</option></select></div></div>
         <div id="playerRatings"></div></div>
       <div class="modal-foot"><button class="btn btn-soft" type="button" id="cancelDialog">Annuler</button><button class="btn btn-solid" type="submit" id="savePlayer">Enregistrer le joueur</button></div>
     </form>
@@ -500,7 +535,7 @@
   'use strict';
   (() => {
     // ================================================================
-    // CONFIGURATION V6 - RENSEIGNEZ URL ET CLE PUBLIABLE AVANT PUBLICATION.
+    // CONFIGURATION V1.1 - Conservez vos identifiants Supabase existants.
     // N'utilisez JAMAIS de cle sb_secret_ ou service_role dans le HTML.
     // ================================================================
     const SUPABASE_URL = 'https://dhqseavsswufmpsjprkp.supabase.co';
@@ -527,8 +562,10 @@
     const clamp = (n,min,max) => Math.min(max,Math.max(min,n));
     const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0;
     const normalize = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'');
-    let state = {version:6,players:[],criteria:structuredClone(BASE_CRITERIA),teamCount:3,lastTeams:null,runMeta:null,tournamentMode:false,lockedTeam:0,lockedIds:[],history:[],logoDataUrl:DEFAULT_CLUB_LOGO};
+    let state = {version:7,appVersion:'1.1',players:[],guests:[],criteria:structuredClone(BASE_CRITERIA),teamCount:3,lastTeams:null,runMeta:null,tournamentMode:false,tournamentLocks:[{enabled:true,noWomen:false,ids:[]},{enabled:false,noWomen:false,ids:[]}],manualFreeWomen:false,history:[],logoDataUrl:DEFAULT_CLUB_LOGO};
     let editingPlayerId = null;
+    let editingGuestId = null;
+    let playerFormGuest = false;
     let currentSearch = '';
     let playerSort = {key:'name',dir:1};
     let editingTeams = false;
@@ -548,28 +585,51 @@
       if(!input||typeof input!=='object')throw new Error('Format JSON invalide.');
       const legacy=Number(input.version||1)<2;
       const criteria=(Array.isArray(input.criteria)?input.criteria:BASE_CRITERIA).slice(0,12).map((c,i)=>({
-        id:String(c.id ?? 'crit-'+i).slice(0,70),name:String(c.name||'Critère '+(i+1)).trim().slice(0,34),weight:clamp(Math.round(Number(c.weight)||0),0,4)
+        id:String(c.id ?? 'crit-'+i).slice(0,70),name:String(c.name||'Critere '+(i+1)).trim().slice(0,34),weight:clamp(Math.round(Number(c.weight)||0),0,4)
       })).filter(c=>c.name);
-      if(!criteria.length)throw new Error('La sauvegarde doit contenir au moins un critère.');
+      if(!criteria.length)throw new Error('La sauvegarde doit contenir au moins un critere.');
       const criterionIds=new Set();criteria.forEach(c=>{if(criterionIds.has(c.id))c.id=uid();criterionIds.add(c.id)});
-      const players=(Array.isArray(input.players)?input.players:[]).slice(0,600).map((p,i)=>{
+      const used=new Set();
+      function normalizePerson(p,i,isGuest){
         const ratings={};criteria.forEach(c=>{const n=Number(p.ratings?.[c.id]);ratings[c.id]=Number.isFinite(n)?clamp(Math.round(legacy?(1+(clamp(n,1,5)-1)*3/4):n),1,4):3});
         const rawSex=normalize(p.sex||'homme');
-        return {id:String(p.id||uid()),name:String(p.name??'').trim().slice(0,65)||'Joueur '+(i+1),ratings,sex:['f','femme','female'].includes(rawSex)?'F':'H',available:p.available!==false && p.available!=='false' && p.available!==0};
-      });
-      const used=new Set();players.forEach(p=>{if(used.has(p.id))p.id=uid();used.add(p.id)});
+        let id=String(p.id||uid()).slice(0,100);if(used.has(id)){id=uid()}used.add(id);
+        const raw=String(p.name??'').trim().slice(0,65);
+        return {id,name:raw||(isGuest?'Invite '+(i+1):'Joueur '+(i+1)),ratings,
+          sex:['f','femme','female'].includes(rawSex)?'F':'H',available:isGuest?true:p.available!==false && p.available!=='false' && p.available!==0,...(isGuest?{guest:true}:{})};
+      }
+      const players=(Array.isArray(input.players)?input.players:[]).slice(0,600).map((p,i)=>normalizePerson(p,i,false));
+      const guests=(Array.isArray(input.guests)?input.guests:[]).slice(0,80).map((p,i)=>normalizePerson(p,i,true));
       const history=(Array.isArray(input.history)?input.history:[]).slice(0,12).filter(h=>h&&typeof h==='object'&&/^\d{4}-\d{2}-\d{2}$/.test(h.week)&&Array.isArray(h.teams)).map(h=>({
         week:h.week,teams:h.teams.slice(0,12).map(t=>Array.isArray(t)?t.slice(0,600).map(m=>({id:String(m.id||''),name:String(m.name||'Joueur').slice(0,65)})).filter(m=>m.id):[])
       }));
       const teamCount=clamp(Math.round(Number(input.teamCount)||3),2,12);
-      const eligible=new Set(players.filter(p=>p.available).map(p=>p.id));
+      const allAvailable=new Set([...players.filter(p=>p.available),...guests].map(p=>p.id));
       let lastTeams=null,runMeta=null;
       if(Array.isArray(input.lastTeams)&&input.lastTeams.length===teamCount){
         const assigned=input.lastTeams.flat();
-        if(assigned.length===eligible.size&&new Set(assigned).size===eligible.size&&assigned.every(id=>eligible.has(id))){lastTeams=input.lastTeams;runMeta=input.runMeta||null}
+        if(assigned.length===allAvailable.size&&new Set(assigned).size===allAvailable.size&&assigned.every(id=>allAvailable.has(id))){
+          lastTeams=input.lastTeams.map(t=>t.slice());runMeta=input.runMeta||null;
+        }
       }
-      return {version:6,players,criteria,teamCount,lastTeams,runMeta,
-        tournamentMode:input.tournamentMode===true,lockedTeam:clamp(Math.round(Number(input.lockedTeam)||0),0,teamCount-1),lockedIds:(Array.isArray(input.lockedIds)?input.lockedIds:[]).filter(id=>eligible.has(id)),history:pruneHistory(history),
+      const rawLocks=Array.isArray(input.tournamentLocks)?input.tournamentLocks:[
+        {enabled:true,noWomen:false,ids:Array.isArray(input.lockedIds)?input.lockedIds:[]},
+        {enabled:false,noWomen:false,ids:[]}
+      ];
+      const claimed=new Set();
+      const tournamentLocks=[0,1].map(index=>{
+        const raw=rawLocks[index]||{};
+        const noWomen=raw.noWomen===true;
+        const ids=[];
+        (Array.isArray(raw.ids)?raw.ids:[]).forEach(id=>{
+          const p=[...players,...guests].find(x=>x.id===id);
+          if(p&&allAvailable.has(id)&&!claimed.has(id)&&(!noWomen||p.sex!=='F')){ids.push(id);claimed.add(id)}
+        });
+        return {enabled:raw.enabled===true,noWomen,ids};
+      });
+      return {version:7,appVersion:'1.1',players,guests,criteria,teamCount,lastTeams,runMeta,
+        tournamentMode:input.tournamentMode===true,tournamentLocks,manualFreeWomen:input.manualFreeWomen===true,
+        history:pruneHistory(history),
         logoDataUrl:typeof input.logoDataUrl==='string' && /^data:image\/(png|jpeg|webp);base64,[a-z0-9+/=]+$/i.test(input.logoDataUrl) && input.logoDataUrl.length<850000?input.logoDataUrl:DEFAULT_CLUB_LOGO};
     }
     function weekStart(date=new Date()) {
@@ -586,6 +646,9 @@
       return Array.from(unique.values()).sort((a,b)=>b.week.localeCompare(a.week)).slice(0,4);
     }
     const availablePlayers=()=>state.players.filter(p=>p.available);
+    const participants=()=>[...availablePlayers(),...state.guests];
+    const findPerson=id=>state.players.find(p=>p.id===id)||state.guests.find(p=>p.id===id);
+    const dropFromTournament=id=>state.tournamentLocks.forEach(l=>{l.ids=l.ids.filter(x=>x!==id)});
     const sortedPlayers=ps=>ps.slice().sort((a,b)=>a.name.localeCompare(b.name,'fr',{sensitivity:'base',numeric:true}));
     let cloudClient=null, cloudReady=false, cloudLoading=false, remoteRevision=null;
     let cloudDirty=false, cloudSaving=false, cloudConflict=false, cloudChannel=null;
@@ -846,17 +909,19 @@
     }
     function totalLabel(n) {return String(n).replace('.',',')}
     function renderMetrics() {
-      const n=availablePlayers().length,t=state.teamCount;
+      const n=participants().length,t=state.teamCount;
       el('statPlayers').textContent=n;
       el('statTeams').textContent=t;
       const low=Math.floor(n/t),high=Math.ceil(n/t);
-      if(state.tournamentMode && state.lockedIds.length){
-        const pinned=state.lockedIds.filter(id=>availablePlayers().some(p=>p.id===id)).length;
-        const rest=n-pinned,otherLow=Math.floor(rest/(t-1)),otherHigh=Math.ceil(rest/(t-1));
-        el('statPerTeam').textContent=pinned+' fixe · '+(otherLow===otherHigh?otherLow:otherLow+'–'+otherHigh)+' autres';
-      }else el('statPerTeam').textContent=n===0?'—':low===high?String(low):low+'–'+high;
+      const locks=state.tournamentMode?state.tournamentLocks.filter(l=>l.enabled):[];
+      const pinned=locks.reduce((sum,l)=>sum+l.ids.filter(id=>participants().some(p=>p.id===id)).length,0);
+      const otherTeams=t-locks.length;
+      if(locks.length&&otherTeams>0){
+        const rest=n-pinned,restLow=Math.floor(rest/otherTeams),restHigh=Math.ceil(rest/otherTeams);
+        el('statPerTeam').textContent=pinned+' fixes / '+(restLow===restHigh?restLow:restLow+'-'+restHigh)+' autres';
+      }else el('statPerTeam').textContent=n===0?'-':low===high?String(low):low+'-'+high;
       el('playersCountChip').textContent=state.players.length+' total';
-      el('statPlayersCaption').textContent='disponibles / '+state.players.length+' inscrits';
+      el('statPlayersCaption').textContent=state.guests.length?state.players.filter(p=>p.available).length+' inscrits + '+state.guests.length+' invite(s)': 'disponibles / '+state.players.length+' inscrits';
       el('teamCountOutput').textContent=t;
       el('removeTeam').disabled=t<=2;
       el('addTeam').disabled=t>=12;
@@ -880,6 +945,13 @@
           <td><div class="rowactions"><button class="icon-btn" data-action="edit" data-id="${escapeHtml(p.id)}" title="Modifier ${escapeHtml(p.name)}" aria-label="Modifier ${escapeHtml(p.name)}">✎</button><button class="icon-btn danger" data-action="delete" data-id="${escapeHtml(p.id)}" title="Supprimer ${escapeHtml(p.name)}" aria-label="Supprimer ${escapeHtml(p.name)}">×</button></div></td></tr>`;
       }).join('')}</tbody></table>`;
     }
+    function renderGuests(){
+      el('guestCount').textContent=String(state.guests.length);
+      el('clearGuests').disabled=!state.guests.length;
+      el('guestRoster').innerHTML=state.guests.length?sortedPlayers(state.guests).map(g=>
+        `<div class="guest-entry"><div class="guest-person">${escapeHtml(g.name)} <span class="guest-mark">INVITÉ</span><small>${g.sex==='F'?'Femme':'Homme'} &middot; ${totalLabel(playerAverage(g).toFixed(1))}/4</small></div><div class="guest-controls"><button type="button" class="icon-btn" data-guest-edit="${escapeHtml(g.id)}" aria-label="Modifier ${escapeHtml(g.name)}" title="Modifier">&#9998;</button><button type="button" class="icon-btn danger" data-guest-delete="${escapeHtml(g.id)}" aria-label="Supprimer ${escapeHtml(g.name)}" title="Supprimer">&times;</button></div></div>`
+      ).join(''):'<div class="guest-empty">Aucun invit&eacute; pour cette s&eacute;ance. Ajoutez un pr&eacute;nom pour compl&eacute;ter les &eacute;quipes.</div>';
+    }
     function renderCriteria() {
       el('criteriaList').innerHTML=state.criteria.map((c,i)=>`<div class="criterion-item"><div class="criterion-top"><div class="criterion-name"><span class="criterion-dot" style="background:${COLORS[i%COLORS.length][0]}"></span>${escapeHtml(c.name)}</div><div class="criterion-actions"><span class="weight-value" id="weight-out-${i}">${c.weight} / 4</span><button class="tiny-icon" type="button" title="Renommer ${escapeHtml(c.name)}" data-action="rename" data-id="${escapeHtml(c.id)}" aria-label="Renommer ${escapeHtml(c.name)}">✎</button><button class="tiny-icon" type="button" title="Supprimer ${escapeHtml(c.name)}" data-action="remove" data-id="${escapeHtml(c.id)}" aria-label="Supprimer ${escapeHtml(c.name)}">×</button></div></div><input type="range" min="0" max="4" step="1" value="${c.weight}" data-criterion="${escapeHtml(c.id)}" data-index="${i}" aria-label="Poids du critère ${escapeHtml(c.name)}"><div class="scale-labels"><span>Faible priorité</span><span>Très important</span></div></div>`).join('');
     }
@@ -899,83 +971,118 @@
       }).join('');
     }
     function skillScoreForTeams(teams) {
-      const roster=teams.flat().map(id=>state.players.find(p=>p.id===id)).filter(Boolean);
+      const roster=teams.flat().map(id=>findPerson(id)).filter(Boolean);
       const weights=state.criteria.map(c=>Math.max(0,c.weight));
       const sum=weights.reduce((a,b)=>a+b,0);
       const normalized=weights.map(w=>sum?w/sum:1/weights.length);
       const goals=state.criteria.map(c=>avg(roster.map(p=>p.ratings[c.id]||3)));
       return avg(teams.map(ids=>{
-        const players=ids.map(id=>state.players.find(p=>p.id===id)).filter(Boolean);
+        const players=ids.map(id=>findPerson(id)).filter(Boolean);
         return state.criteria.reduce((loss,c,i)=>loss+normalized[i]*(avg(players.map(p=>p.ratings[c.id]||3))-goals[i])**2,0);
       }));
     }
-    function swapPlayers(id) {
+    function lockedResultIndices(){
+      if(state.runMeta?.mode!=='tournoi')return [];
+      return Array.isArray(state.runMeta?.lockedTeams)?state.runMeta.lockedTeams:
+        Number.isInteger(state.runMeta?.lockedTeam)?[state.runMeta.lockedTeam]:[];
+    }
+    function applyManualChange(draft,message){
+      const ids=draft.flat();
+      if(new Set(ids).size!==ids.length){toast('Une personne ne peut pas etre dans deux equipes.',true);return false}
+      if(draft.some(t=>!t.length)){toast('Chaque equipe doit conserver au moins une personne.',true);return false}
+      if(state.runMeta?.mode==='tournoi'){
+        for(let i=0;i<2;i++){
+          if(state.tournamentLocks[i].enabled && state.tournamentLocks[i].noWomen &&
+            draft[i].some(id=>findPerson(id)?.sex==='F')){
+            toast('Cette equipe de tournoi est configuree sans femmes.',true);return false;
+          }
+        }
+      }
+      const women=draft.map(t=>t.filter(id=>findPerson(id)?.sex==='F').length);
+      if(!state.manualFreeWomen && !(state.runMeta?.mode==='tournoi'&&state.tournamentLocks.some(l=>l.enabled&&l.noWomen)) && Math.max(...women)-Math.min(...women)>1){
+        toast('Repartition des femmes desequilibree : cochez Répartition libre en mode ajustement.',true);return false;
+      }
+      swapUndo={teams:state.lastTeams.map(t=>t.slice()),meta:{...state.runMeta},locks:structuredClone(state.tournamentLocks)};
+      state.lastTeams=draft;
+      if(state.runMeta?.mode==='tournoi'){
+        lockedResultIndices().forEach(i=>{if(i<2 && state.tournamentLocks[i].enabled)state.tournamentLocks[i].ids=draft[i].slice()});
+      }
+      const score=skillScoreForTeams(draft);
+      state.runMeta={...state.runMeta,score,fairness:clamp(Math.round(100-35*Math.sqrt(Math.max(0,score))),0,100),manualEdits:(state.runMeta?.manualEdits||0)+1};
+      selectedSwap=null;changeState(false);toast(message);return true;
+    }
+    function swapPlayers(id){
       if(!editingTeams||!state.lastTeams)return;
-      const targetTeam=state.lastTeams.findIndex(t=>t.includes(id));
-      if(targetTeam<0)return;
-      if(state.runMeta?.mode==='tournoi' && targetTeam===state.runMeta.lockedTeam){toast('L’équipe de tournoi est verrouillée. Modifiez sa sélection dans le mode tournoi puis régénérez.',true);return}
+      const targetTeam=state.lastTeams.findIndex(t=>t.includes(id));if(targetTeam<0)return;
       if(!selectedSwap){selectedSwap=id;renderResults();return}
       if(selectedSwap===id){selectedSwap=null;renderResults();return}
       const sourceTeam=state.lastTeams.findIndex(t=>t.includes(selectedSwap));
       if(sourceTeam<0){selectedSwap=id;renderResults();return}
       if(sourceTeam===targetTeam){selectedSwap=id;renderResults();return}
-      const first=state.players.find(p=>p.id===selectedSwap),second=state.players.find(p=>p.id===id);
+      const first=findPerson(selectedSwap),second=findPerson(id);
       if(!first||!second){selectedSwap=null;return}
       const draft=state.lastTeams.map(ids=>ids.slice());
       draft[sourceTeam][draft[sourceTeam].indexOf(first.id)]=second.id;
       draft[targetTeam][draft[targetTeam].indexOf(second.id)]=first.id;
-      const women=draft.map(team=>team.filter(pid=>state.players.find(p=>p.id===pid)?.sex==='F').length);
-      if(Math.max(...women)-Math.min(...women)>1){
-        toast('Échange impossible : la répartition des femmes doit rester équitable. Sélectionnez un autre joueur.',true);
-        selectedSwap=null;renderResults();return;
-      }
-      swapUndo={teams:state.lastTeams.map(t=>t.slice()),meta:{...state.runMeta}};
-      state.lastTeams=draft;
-      const score=skillScoreForTeams(draft);
-      state.runMeta={...state.runMeta,score,fairness:clamp(Math.round(100-35*Math.sqrt(Math.max(0,score))),0,100),manualEdits:(state.runMeta?.manualEdits||0)+1};
-      selectedSwap=null;changeState(false);
-      toast(`${first.name} et ${second.name} ont échangé d’équipe.`);
+      applyManualChange(draft,first.name+' et '+second.name+" ont change d'equipe.");
     }
-    function renderResults() {
-      const actions=el('resultButtons'), body=el('resultsContent');
+    function movePerson(id,destination){
+      if(!editingTeams||!state.lastTeams)return;
+      const source=state.lastTeams.findIndex(t=>t.includes(id));
+      if(source<0||destination===source||destination<0||destination>=state.lastTeams.length)return;
+      const draft=state.lastTeams.map(team=>team.slice());
+      draft[source]=draft[source].filter(x=>x!==id);draft[destination].push(id);
+      const p=findPerson(id);
+      applyManualChange(draft,(p?.name||'Joueur')+' transfere vers '+teamName(destination)+'.');
+    }
+    function renderResults(){
+      const actions=el('resultButtons'),body=el('resultsContent');
       if(!state.lastTeams){
         el('resultsSubtitle').textContent='Votre futur terrain de jeu commence ici.';
         actions.innerHTML='';
-        body.innerHTML=`<div class="results-empty"><svg class="result-illustration" viewBox="0 0 150 130" fill="none" aria-hidden="true"><rect x="12" y="10" width="126" height="110" rx="15" fill="#fff0f2"/><rect x="21" y="20" width="108" height="90" rx="6" stroke="#d8a3ae" stroke-width="1.6"/><path d="M75 20v90M21 65h108" stroke="#d8a3ae" stroke-width="1.6" stroke-dasharray="4 3"/><circle cx="75" cy="65" r="20" stroke="#d8a3ae" stroke-width="1.6"/><circle cx="50" cy="42" r="8" fill="#d51d37"/><circle cx="95" cy="85" r="8" fill="#17171b"/><circle cx="95" cy="42" r="8" fill="#a7142d"/><circle cx="50" cy="87" r="8" fill="#74747d"/><path d="m52 40-4 4m4 0-4-4M97 83l-4 4m4 0-4-4" stroke="#fff" stroke-width="1.5"/></svg><div><h3 class="empty-result-title">À vous de composer le jeu.</h3><p class="empty-result-text">Dès que votre effectif est prêt, cliquez sur <strong>Générer les équipes</strong>. L'application proposera une répartition en équilibrant les niveaux, sans modifier vos données.</p></div></div>`;
+        body.innerHTML='<div class="results-empty"><div><h3 class="empty-result-title">À vous de composer le jeu.</h3><p class="empty-result-text">Ajoutez des joueurs et des invités, choisissez le nombre d&#39;equipes et cliquez sur Générer les équipes.</p></div></div>';
         return;
       }
-      const teams=state.lastTeams.map(ids=>ids.map(id=>state.players.find(p=>p.id===id)).filter(Boolean));
-      const meta=state.runMeta||{};
+      const teams=state.lastTeams.map(ids=>ids.map(findPerson).filter(Boolean));
+      const meta=state.runMeta||{},pinnedTeams=lockedResultIndices();
       const teamLevels=teams.map(t=>avg(t.map(playerAverage)));
       const spread=Math.max(...teamLevels)-Math.min(...teamLevels);
       const fairness=typeof meta.fairness==='number'?meta.fairness:Math.round(100-spread*15);
       const participating=teams.flat();
-      el('resultsSubtitle').textContent='Joueurs disponibles uniquement · Répartition femmes équitable · Niveau prioritaire.';
-      actions.innerHTML=`<button class="btn ${editingTeams?'btn-solid':'btn-outline'} btn-small" type="button" data-result="edit" aria-pressed="${editingTeams}">${editingTeams?'✓ Terminer les ajustements':'✎ Modifier les équipes'}</button>${editingTeams&&swapUndo?'<button class="btn btn-outline btn-small" type="button" data-result="undo">↶ Annuler l’échange</button>':''}<button class="btn btn-outline btn-small" type="button" data-result="csv">Télécharger CSV ↓</button><button class="btn btn-solid btn-small" type="button" data-result="png">Exporter image PNG ↓</button><button class="btn btn-soft btn-small" type="button" data-result="save-week">✓ Enregistrer cette semaine</button><button class="btn btn-solid btn-small" type="button" data-result="again">↻ Nouvelle répartition</button>`;
-      body.innerHTML=`${editingTeams?`<div class="edit-helper" role="status"><strong>Mode ajustement</strong> ${selectedSwap?`1 joueur sélectionné : <strong>${escapeHtml(state.players.find(p=>p.id===selectedSwap)?.name||'')}</strong>. Cliquez sur un joueur d’une autre équipe pour échanger. Cliquez de nouveau pour annuler.`:'Cliquez sur un joueur, puis un joueur d’une autre équipe pour les échanger. La répartition équitable des femmes reste obligatoire.'}${meta.mode==='tournoi'?' L’équipe fixe du tournoi n’est pas modifiable.':''}</div>`:''}<div class="result-top"><div class="balance-score"><div class="score-ring" style="--percent:${clamp(fairness,0,100)}%"><span>${clamp(fairness,0,100)}</span></div><div><div class="score-label">Indice d'équilibre <span style="color:#95a395;font-weight:650">/ 100</span></div><div class="score-sub">Indicateur heuristique calculé à partir des niveaux. La priorité reste le niveau ; la rotation historique est secondaire.</div></div></div><div class="score-stats"><div class="score-stat"><strong>${spread.toFixed(2).replace('.',',')}</strong><span>écart max. de niveau / 4</span></div><div class="score-stat"><strong>${teams.length}</strong><span>équipes constituées</span></div></div></div>
-        <div class="rotation-pill">${participating.filter(p=>p.sex==='F').length} femmes au total · ${teams.map((t,i)=>`${teamName(i)} : ${t.filter(p=>p.sex==='F').length} F`).join(' · ')}${meta.historyWeeks?` · Rotation analysée sur ${meta.historyWeeks} semaine(s) sauvegardée(s)`:''}</div>
+      const femaleCounts=teams.map(t=>t.filter(p=>p.sex==='F').length);
+      const genderBalanced=Math.max(...femaleCounts)-Math.min(...femaleCounts)<=1;
+      el('resultsSubtitle').textContent=meta.mode==='tournoi'?'Équipes tournoi fixes et autres équipes équilibrées selon les niveaux.':'Joueurs disponibles et invités - priorité à l\'équilibre des niveaux.';
+      actions.innerHTML=`<button class="btn ${editingTeams?'btn-solid':'btn-outline'} btn-small" type="button" data-result="edit" aria-pressed="${editingTeams}">${editingTeams?'&#10003; Terminer les ajustements':'&#9998; Modifier les équipes'}</button>${editingTeams&&swapUndo?'<button class="btn btn-outline btn-small" type="button" data-result="undo">&#8617; Annuler la derniere modification</button>':''}<button class="btn btn-outline btn-small" type="button" data-result="csv">Télécharger CSV &darr;</button><button class="btn btn-solid btn-small" type="button" data-result="png">Exporter image PNG &darr;</button><button class="btn btn-soft btn-small" type="button" data-result="save-week">&#10003; Enregistrer cette semaine</button><button class="btn btn-solid btn-small" type="button" data-result="again">&#8635; Nouvelle répartition</button>`;
+      const helper=editingTeams?`<div class="edit-helper" role="status"><strong>Mode ajustement.</strong> Cliquez sur deux joueurs pour les <strong>échanger</strong>, ou choisissez une destination sous un joueur pour le <strong>transférer sans échange</strong>. ${selectedSwap?`Selection : <strong>${escapeHtml(findPerson(selectedSwap)?.name||'')}</strong>.`:''}${meta.mode==='tournoi'?' Les équipes tournoi restent modifiables ici : leurs sélections fixes seront mises à jour.':''}<label class="compact-check"><input id="manualFreeWomen" type="checkbox" ${state.manualFreeWomen?'checked':''}> Autoriser une répartition libre des femmes dans les équipes</label></div>`:'';
+      body.innerHTML=`${helper}<div class="result-top"><div class="balance-score"><div class="score-ring" style="--percent:${clamp(fairness,0,100)}%"><span>${clamp(fairness,0,100)}</span></div><div><div class="score-label">Indice d'équilibre <span style="color:#95959b;font-weight:650">/ 100</span></div><div class="score-sub">Indice heuristique basé sur les critères pondérés. La rotation historique intervient en second.</div></div></div><div class="score-stats"><div class="score-stat"><strong>${spread.toFixed(2).replace('.',',')}</strong><span>Écart maximal de niveau / 4</span></div><div class="score-stat"><strong>${teams.length}</strong><span>equipes</span></div></div></div>
+        <div class="rotation-pill">${participating.filter(p=>p.sex==='F').length} femmes au total &middot; ${teams.map((t,i)=>`${teamName(i)} : ${femaleCounts[i]} F`).join(' &middot; ')} &middot; ${genderBalanced?'Répartition équitable':'Répartition libre'}${meta.historyWeeks?` &middot; Rotation : ${meta.historyWeeks} semaine(s)`:''}</div>
         <div class="team-grid">${teams.map((team,i)=>{
-          const canEdit=editingTeams && !(meta.mode==='tournoi'&&i===meta.lockedTeam);
-          const groupHtml=sortedPlayers(team).map(p=>{
-            const content=`<span><span class="member-name">${escapeHtml(p.name)}</span><span class="member-position">· ${p.sex==='F'?'Femme':'Homme'}</span></span><span class="member-rating">${playerAverage(p).toFixed(1).replace('.',',')} / 4</span>`;
-            return canEdit?`<button class="member member-pick ${selectedSwap===p.id?'member-selected':''}" type="button" data-swap-id="${escapeHtml(p.id)}" aria-pressed="${selectedSwap===p.id}" aria-label="${escapeHtml(p.name)}, ${teamName(i)}. ${selectedSwap===p.id?'Sélectionné':'Sélectionner pour échange'}">${content}</button>`:`<div class="member">${content}</div>`;
+          const level=teamLevels[i],hue=COLORS[i%COLORS.length],locked=pinnedTeams.includes(i);
+          const memberHtml=sortedPlayers(team).map(p=>{
+            const content=`<span><span class="member-name">${escapeHtml(p.name)}</span>${p.guest?'<span class="guest-mark">INVITÉ</span>':''}<span class="member-position"> &middot; ${p.sex==='F'?'Femme':'Homme'}</span></span><span class="member-rating">${playerAverage(p).toFixed(1).replace('.',',')} / 4</span>`;
+            if(!editingTeams)return `<div class="member">${content}</div>`;
+            const choices=teams.map((_,ti)=>ti!==i?`<option value="${ti}">${teamName(ti)}</option>`:'').join('');
+            return `<div class="member-edit-row"><button class="member member-pick ${selectedSwap===p.id?'member-selected':''}" type="button" data-swap-id="${escapeHtml(p.id)}" aria-pressed="${selectedSwap===p.id}" aria-label="${escapeHtml(p.name)} : sélectionner pour échange">${content}</button><select class="move-target" data-move-id="${escapeHtml(p.id)}" aria-label="Transferer ${escapeHtml(p.name)} vers une autre equipe"><option value="">Transférer vers...</option>${choices}</select></div>`;
           }).join('');
-          const level=teamLevels[i];
-          const hue=COLORS[i%COLORS.length];
-          return `<article class="team-card" style="--team-color:${hue[0]};--team-tint:${hue[1]};--team-ink:${TEAM_INK[i%TEAM_INK.length]}"><div class="team-card-head"><div class="team-name-line"><div class="team-title"><span class="team-label">${teamName(i)}</span> ${meta.mode==='tournoi'&&i===meta.lockedTeam?'<span class="team-lock-tag">FIXE</span>':''}</div><span class="team-headcount">${team.length} joueur${team.length>1?'s':''}</span></div><div class="team-avg"><label>Note moyenne pondérée</label><strong>${level.toFixed(2).replace('.',',')} / 4</strong></div><div class="team-meter"><span style="width:${clamp(level/4*100,0,100)}%"></span></div></div><div class="team-members">${groupHtml}</div><div class="team-foot">${team.filter(p=>p.sex==='F').length} femme(s) · ${team.filter(p=>p.sex!=='F').length} homme(s)</div></article>`;
+          return `<article class="team-card" style="--team-color:${hue[0]};--team-tint:${hue[1]};--team-ink:${TEAM_INK[i%TEAM_INK.length]}"><div class="team-card-head"><div class="team-name-line"><div class="team-title"><span class="team-label">${teamName(i)}</span> ${locked?'<span class="team-lock-tag">TOURNOI</span>':''}</div><span class="team-headcount">${team.length} personne${team.length>1?'s':''}</span></div><div class="team-avg"><label>Note moyenne pondérée</label><strong>${level.toFixed(2).replace('.',',')} / 4</strong></div><div class="team-meter"><span style="width:${clamp(level/4*100,0,100)}%"></span></div></div><div class="team-members">${memberHtml}</div><div class="team-foot">${femaleCounts[i]} femme(s) &middot; ${team.length-femaleCounts[i]} homme(s)</div></article>`;
         }).join('')}</div>
-        <div class="comparison"><h3>Comparatif des équipes</h3><p>Moyennes calculées uniquement sur les joueurs disponibles affectés (notes de 1 à 4).</p><div class="comparison-scroll"><table class="compare-table"><thead><tr><th>Critère</th>${teams.map((_,i)=>`<th>${teamName(i)}</th>`).join('')}<th>Moyenne générale</th></tr></thead><tbody>${state.criteria.map(c=>`<tr><td>${escapeHtml(c.name)} ${c.weight===0?'<span style="color:#a0aba1">(ignoré)</span>':''}</td>${teams.map(t=>{const n=avg(t.map(p=>p.ratings[c.id]||3));return `<td><strong>${n.toFixed(2).replace('.',',')}</strong><div class="compare-bar"><span style="width:${n*25}%"></span></div></td>`}).join('')}<td>${avg(participating.map(p=>p.ratings[c.id]||3)).toFixed(2).replace('.',',')}</td></tr>`).join('')}<tr class="global-row"><td>Note pondérée</td>${teamLevels.map(n=>`<td><strong>${n.toFixed(2).replace('.',',')}</strong></td>`).join('')}<td><strong>${avg(participating.map(playerAverage)).toFixed(2).replace('.',',')}</strong></td></tr></tbody></table></div></div>`;
+        <div class="comparison"><h3>Comparatif des équipes</h3><p>Moyennes calculées sur tous les participants, y compris les invités. Notes sur 4.</p><div class="comparison-scroll"><table class="compare-table"><thead><tr><th>Critere</th>${teams.map((_,i)=>`<th>${teamName(i)}</th>`).join('')}<th>Moyenne générale</th></tr></thead><tbody>${state.criteria.map(c=>`<tr><td>${escapeHtml(c.name)} ${c.weight===0?'<span style="color:#a0aba1">(ignore)</span>':''}</td>${teams.map(t=>{const n=avg(t.map(p=>p.ratings[c.id]||3));return `<td><strong>${n.toFixed(2).replace('.',',')}</strong><div class="compare-bar"><span style="width:${n*25}%"></span></div></td>`}).join('')}<td>${avg(participating.map(p=>p.ratings[c.id]||3)).toFixed(2).replace('.',',')}</td></tr>`).join('')}<tr class="global-row"><td>Note pondérée</td>${teamLevels.map(n=>`<td><strong>${n.toFixed(2).replace('.',',')}</strong></td>`).join('')}<td><strong>${avg(participating.map(playerAverage)).toFixed(2).replace('.',',')}</strong></td></tr></tbody></table></div></div>`;
     }
-    function renderAll(){renderLogo();renderMetrics();renderPlayers();renderCriteria();renderTournament();renderResults();renderHistory();renderDistribution()}
+    function renderAll(){renderLogo();renderMetrics();renderPlayers();renderGuests();renderCriteria();renderTournament();renderResults();renderHistory();renderDistribution()}
 
-    function openPlayer(id=null) {
-      editingPlayerId=id;
-      const player=id?state.players.find(p=>p.id===id):null;
+    function openPlayer(id=null,asGuest=false) {
+      playerFormGuest=asGuest;
+      editingPlayerId=asGuest?null:id;editingGuestId=asGuest?id:null;
+      const player=id?(asGuest?state.guests:state.players).find(p=>p.id===id):null;
       if(id&&!player)return;
-      el('dialogTitle').textContent=player?'Modifier le joueur':'Ajouter un joueur';
+      el('dialogTitle').textContent=asGuest?(player?'Modifier un invité':'Ajouter un invité'):(player?'Modifier le joueur':'Ajouter un joueur');
+      el('playerNameLabel').textContent=asGuest?"Prénom de l'invité *":'Nom du joueur *';
+      el('playerName').placeholder=asGuest?'Ex. Alex':'Ex. Camille Martin';
       el('playerName').value=player?.name || '';
       el('playerSex').value=player?.sex||'H';
+      el('playerAvailableField').hidden=asGuest;
       el('playerAvailable').value=player?.available===false?'no':'yes';
+      el('savePlayer').textContent=asGuest?"Enregistrer l'invité":'Enregistrer le joueur';
       el('playerRatings').innerHTML=state.criteria.map((c,i)=>`<div class="rating-field"><div class="rating-field-head"><label for="rating-${i}">${escapeHtml(c.name)}</label><output class="rating-number" id="rating-output-${i}">${player?.ratings[c.id] || 3} / 4</output></div><input id="rating-${i}" data-rating-id="${escapeHtml(c.id)}" data-rating-index="${i}" type="range" min="1" max="4" step="1" value="${player?.ratings[c.id] || 3}" aria-label="Note ${escapeHtml(c.name)}"></div>`).join('');
       if(typeof el('playerDialog').showModal==='function')el('playerDialog').showModal();else el('playerDialog').setAttribute('open','');
       setTimeout(()=>el('playerName').focus(),0);
@@ -983,16 +1090,21 @@
     function closePlayer(){el('playerDialog').close()}
     function commitPlayer(e) {
       e.preventDefault();
-      const name=el('playerName').value.trim();
-      if(!name){toast('Saisissez le nom du joueur.',true);el('playerName').focus();return}
-      if(state.players.length>=600&&!editingPlayerId){toast('Limite de 600 joueurs atteinte.',true);return}
+      const rawName=el('playerName').value.trim();
+      if(!rawName){toast('Saisissez un nom ou prenom.',true);el('playerName').focus();return}
+      if(playerFormGuest&&state.guests.length>=80&&!editingGuestId){toast('Limite de 80 invites.',true);return}
+      if(!playerFormGuest&&state.players.length>=600&&!editingPlayerId){toast('Limite de 600 joueurs.',true);return}
       const ratings={};
       el('playerRatings').querySelectorAll('input[data-rating-id]').forEach(input=>ratings[input.dataset.ratingId]=clamp(Number(input.value),1,4));
-      const next={id:editingPlayerId||uid(),name:name.slice(0,65),ratings,sex:el('playerSex').value==='F'?'F':'H',available:el('playerAvailable').value==='yes'};
-      if(!next.available)state.lockedIds=state.lockedIds.filter(id=>id!==next.id);
-      if(editingPlayerId){const idx=state.players.findIndex(p=>p.id===editingPlayerId);if(idx>=0)state.players[idx]=next;}
-      else state.players.push(next);
-      closePlayer();changeState();toast(editingPlayerId?'Joueur mis à jour.':'Joueur ajouté.');
+      const guest=playerFormGuest;
+      const name=(guest?rawName.split(/\s+/)[0]:rawName).slice(0,65);
+      const oldId=guest?editingGuestId:editingPlayerId;
+      const next={id:oldId||uid(),name,ratings,sex:el('playerSex').value==='F'?'F':'H',available:guest?true:el('playerAvailable').value==='yes',...(guest?{guest:true}:{})};
+      if(!next.available)dropFromTournament(next.id);
+      if(oldId){const list=guest?state.guests:state.players,idx=list.findIndex(p=>p.id===oldId);if(idx>=0)list[idx]=next;}
+      else if(guest)state.guests.push(next);else state.players.push(next);
+      if(next.sex==='F')state.tournamentLocks.filter(l=>l.noWomen).forEach(l=>{l.ids=l.ids.filter(id=>id!==next.id)});
+      closePlayer();changeState();toast(guest?'Invité enregistré.':oldId?'Joueur mis a jour.':'Joueur ajoute.');
     }
     function addCriterion(e) {
       e.preventDefault();const input=el('newCriterion'),name=input.value.trim();
@@ -1000,7 +1112,7 @@
       if(state.criteria.length>=12){toast('Maximum de 12 critères.',true);return}
       if(state.criteria.some(c=>normalize(c.name)===normalize(name))){toast('Ce critère existe déjà.',true);return}
       const id='crit-'+uid();state.criteria.push({id,name:name.slice(0,34),weight:3});
-      state.players.forEach(p=>p.ratings[id]=3);
+      [...state.players,...state.guests].forEach(p=>p.ratings[id]=3);
       input.value='';changeState();toast('Critère ajouté avec une note initiale de 3/4 pour chaque joueur.');
     }
     function demoRoster() {
@@ -1021,24 +1133,34 @@
         state.criteria.forEach(c=>{const idx=BASE_CRITERIA.findIndex(b=>b.id===c.id);ratings[c.id]=idx>=0?clamp(Math.round(1+(defaultRatings[idx]-1)*.75),1,4):3});
         return {id:uid(),name:row[0],ratings,sex:/^(Camille|Louise|Nina|Chloé|Emma|Maya|Inès|Lina|Sarah|Zoé)/.test(row[0])?'F':'H',available:true};
       });
-      currentSearch='';el('playerSearch').value='';state.lockedIds=[];state.history=[];
+      currentSearch='';el('playerSearch').value='';state.tournamentLocks.forEach(l=>{l.ids=[]});state.guests=[];state.history=[];
       changeState();toast('24 joueurs de démonstration chargés.');
     }
 
     // Les effectifs et la présence féminine sont des contraintes strictes.
     // L’optimisation recherche d’abord le meilleur niveau, puis renouvelle les associations
     // sans dégrader les niveaux de plus de 0,012 pt².
-    function balancePlayers(players,nTeams,criteria,lockedTeam,lockedIds,history) {
-      const n=players.length,k=criteria.length,locked=lockedTeam>=0;
-      const fixedSet=new Set(lockedIds);
-      const fixed=players.map((p,i)=>fixedSet.has(p.id)?i:-1).filter(i=>i>=0);
+    function balancePlayers(players,nTeams,criteria,lockedTeams,history) {
+      const n=players.length,k=criteria.length;
+      const fixedTeams=(Array.isArray(lockedTeams)?lockedTeams:[]).filter(t=>t&&Number.isInteger(t.index)&&t.index>=0&&t.index<nTeams);
+      const activeIndices=new Set(fixedTeams.map(t=>t.index));
+      const fixedSet=new Set();
+      fixedTeams.forEach(t=>{
+        for(const id of t.ids){
+          const p=players.find(person=>person.id===id);
+          if(!p)throw Error("Une personne de l'equipe fixe est indisponible.");
+          if(fixedSet.has(id))throw Error('Une personne est selectionnee dans deux equipes tournoi.');
+          if(t.noWomen&&p.sex==='F')throw Error('Une equipe tournoi sans femmes contient une joueuse.');
+          fixedSet.add(id);
+        }
+        if(!t.ids.length)throw Error('Chaque equipe tournoi active doit contenir au moins une personne.');
+      });
       const femaleCount=players.filter(p=>p.sex==='F').length;
-      const femaleFloor=Math.floor(femaleCount/nTeams),extraWomen=femaleCount%nTeams;
-      const lockedWomen=fixed.filter(i=>players[i].sex==='F').length;
-      if(locked&&(lockedWomen<femaleFloor||lockedWomen>femaleFloor+(extraWomen?1:0))){
-        throw Error(`L'équipe fixe contient ${lockedWomen} femme(s). Chaque équipe doit en avoir ${femaleFloor}${extraWomen?' ou '+(femaleFloor+1):''}. Modifiez la sélection tournoi.`);
-      }
-      if(locked&&n-fixed.length<nTeams-1)throw Error('En mode tournoi, il faut au moins un joueur disponible dans chacune des autres équipes.');
+      const strictWomen=!fixedTeams.some(team=>team.noWomen);
+      const availableTeams=Array.from({length:nTeams},(_,i)=>i).filter(i=>!activeIndices.has(i));
+      const remaining=n-fixedSet.size;
+      if(remaining&&availableTeams.length===0)throw Error('Tous les joueurs doivent etre fixes si les deux seules equipes sont en tournoi. Ajoutez une troisieme equipe.');
+      if(remaining<availableTeams.length)throw Error("Pas assez de personnes pour les equipes restantes. Reduisez les selections fixes ou le nombre d'equipes.");
       const criterionWeights=criteria.map(c=>Math.max(0,c.weight));
       const tw=criterionWeights.reduce((a,b)=>a+b,0);
       const weights=tw?criterionWeights.map(w=>w/tw):criterionWeights.map(()=>1/Math.max(1,k));
@@ -1047,8 +1169,6 @@
         return {sex:p.sex==='F'?1:0,ratings,strength:ratings.reduce((sum,v,i)=>sum+v*weights[i],0)};
       });
       const targets=criteria.map((_,i)=>avg(pp.map(p=>p.ratings[i])));
-      const fixedTeam=locked?lockedTeam:-1;
-      const availableTeams=Array.from({length:nTeams},(_,i)=>i).filter(i=>i!==fixedTeam);
       const histories=pruneHistory(history);
       const lookup=new Map(players.map((p,i)=>[p.id,i]));
       const pairs=new Float32Array(n*n);
@@ -1065,22 +1185,27 @@
       function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
       function rand(m){return Math.floor(Math.random()*m)}
       function layout(){
-        const caps=Array(nTeams).fill(0),free=n-fixed.length;
-        if(locked)caps[fixedTeam]=fixed.length;
-        const base=Math.floor(free/availableTeams.length);
-        availableTeams.forEach(t=>caps[t]=base);
-        shuffle(availableTeams.slice()).slice(0,free%availableTeams.length).forEach(t=>caps[t]++);
+        const caps=Array(nTeams).fill(0),quotas=Array(nTeams).fill(0);
+        fixedTeams.forEach(t=>{
+          caps[t.index]=t.ids.length;
+          quotas[t.index]=t.ids.filter(id=>players.find(p=>p.id===id)?.sex==='F').length;
+        });
+        if(availableTeams.length){
+          const shuffled=shuffle(availableTeams.slice());
+          const base=Math.floor(remaining/shuffled.length);
+          shuffled.forEach((t,i)=>caps[t]=base+(i<remaining%shuffled.length?1:0));
+        }
         if(caps.some(cap=>cap===0))return null;
-        const quotas=Array(nTeams).fill(femaleFloor);
-        let remain=extraWomen;
-        if(locked){quotas[fixedTeam]=lockedWomen;if(lockedWomen===femaleFloor+1)remain--;}
-        if(remain<0)return null;
-        const eligible=shuffle(availableTeams.slice());
-        if(eligible.some(t=>caps[t]<femaleFloor))return null;
-        const highCandidates=eligible.filter(t=>caps[t]>=femaleFloor+1);
-        if(highCandidates.length<remain)return null;
-        highCandidates.slice(0,remain).forEach(t=>quotas[t]++);
-        if(quotas.some((q,t)=>q>caps[t]))return null;
+        const pinnedWomen=fixedTeams.reduce((sum,t)=>sum+quotas[t.index],0);
+        const restWomen=femaleCount-pinnedWomen;
+        if(restWomen<0)return null;
+        for(let w=0;w<restWomen;w++){
+          const choices=shuffle(availableTeams.filter(t=>quotas[t]<caps[t]));
+          if(!choices.length)return null;
+          choices.sort((a,b)=>quotas[a]-quotas[b]);
+          quotas[choices[0]]++;
+        }
+        if(strictWomen && Math.max(...quotas)-Math.min(...quotas)>1)return null;
         return {caps,quotas};
       }
       const newStats=()=>({n:0,women:0,sums:new Float64Array(k)});
@@ -1089,7 +1214,10 @@
 
       function makeInitial(caps,quotas){
         const teams=Array.from({length:nTeams},()=>[]),stats=teams.map(newStats);
-        if(locked)fixed.forEach(i=>{teams[fixedTeam].push(i);update(stats[fixedTeam],i,1)});
+        fixedTeams.forEach(t=>t.ids.forEach(id=>{
+          const i=players.findIndex(p=>p.id===id);
+          if(i>=0){teams[t.index].push(i);update(stats[t.index],i,1)}
+        }));
         for(const sex of [1,0]){
           const ids=pp.map((p,i)=>p.sex===sex&&!fixedSet.has(players[i].id)?i:-1).filter(i=>i>=0);
           shuffle(ids);ids.sort((a,b)=>(pp[b].strength-pp[a].strength)+(Math.random()-.5)*.5);
@@ -1138,7 +1266,7 @@
           }else{update(stats[a],pb,-1);update(stats[a],pa,1);update(stats[b],pa,-1);update(stats[b],pb,1)}
         }
       }
-      if(!possible||!phaseOneTeams)throw Error('Avec cette équipe fixe, il est impossible de répartir équitablement les femmes. Changez les joueurs verrouillés ou le nombre d’équipes.');
+      if(!possible||!phaseOneTeams)throw Error('Répartition impossible : ajustez les equipes fixes, activez Sans femmes si necessaire, ou reduisez le nombre d\u0027equipes.');
       // La seconde passe ne sacrifie presque pas l'équilibre des niveaux ; les joueurs
       // verrouillés restent à leur place et seuls des joueurs du même sexe s'échangent.
       const teams=phaseOneTeams.map(t=>t.slice()),stats=teams.map(team=>{const st=newStats();team.forEach(i=>update(st,i,1));return st});
@@ -1176,46 +1304,54 @@
       const fairness=clamp(Math.round(100-35*Math.sqrt(Math.max(0,bestSkill))),0,100);
       return {teams:selected,fairness,score:bestSkill,repeats:Math.round(finalRepeat),historyWeeks:histories.length};
     }
-    function generate() {
+    function generate(){
       editingTeams=false;selectedSwap=null;swapUndo=null;
-      const eligible=availablePlayers();
-      if(eligible.length<state.teamCount){toast('Il faut au moins un joueur DISPONIBLE par équipe.',true);return}
-      if(!state.criteria.some(c=>c.weight>0)){toast('Activez au moins un critère dans Paramètres.',true);return}
-      const pinned=state.tournamentMode?state.lockedIds.filter(id=>eligible.some(p=>p.id===id)):[];
-      if(state.tournamentMode&&!pinned.length){toast('Mode tournoi : sélectionnez au moins un joueur pour votre équipe fixe.',true);return}
+      const eligible=participants();
+      if(eligible.length<state.teamCount){toast('Il faut au moins une personne disponible par equipe.',true);return}
+      if(!state.criteria.some(c=>c.weight>0)){toast('Activez au moins un critere dans Parametres.',true);return}
+      const locks=state.tournamentMode?state.tournamentLocks.map((lock,index)=>({...lock,index})).filter(lock=>lock.enabled):[];
+      if(state.tournamentMode&&!locks.length){toast('Selectionnez au moins une equipe tournoi (Rouge ou Jaune).',true);return}
+      if(locks.some(lock=>lock.ids.length===0)){toast('Selectionnez au moins une personne pour chaque equipe tournoi active.',true);return}
       try{
-        const result=balancePlayers(eligible,state.teamCount,state.criteria,state.tournamentMode?state.lockedTeam:-1,pinned,state.history);
+        const result=balancePlayers(eligible,state.teamCount,state.criteria,locks,state.history);
         state.lastTeams=result.teams;
-        state.runMeta={fairness:result.fairness,score:result.score,repeatWeight:result.repeats,historyWeeks:result.historyWeeks,mode:state.tournamentMode?'tournoi':'standard',lockedTeam:state.tournamentMode?state.lockedTeam:-1,generatedAt:new Date().toISOString()};
+        state.runMeta={fairness:result.fairness,score:result.score,repeatWeight:result.repeats,historyWeeks:result.historyWeeks,
+          mode:locks.length?'tournoi':'standard',lockedTeams:locks.map(l=>l.index),generatedAt:new Date().toISOString()};
         changeState(false);el('resultats').scrollIntoView({behavior:'smooth',block:'start'});
-        toast('Équipes générées : femmes équilibrées, indisponibles exclus.');
+        toast('Equipes generees : niveaux equilibres, invites pris en compte.');
       }catch(error){toast(error.message,true)}
     }
-    function saveWeek() {
+    function saveWeek(){
       if(!state.lastTeams)return;
       const week=weekStart();
-      if(state.history.some(h=>h.week===week)&&!confirm('Remplacer la composition déjà enregistrée cette semaine ?'))return;
+      if(state.history.some(h=>h.week===week)&&!confirm('Remplacer la composition deja enregistree cette semaine ?'))return;
       const records=state.lastTeams.map(team=>team.map(id=>{
-        const player=state.players.find(p=>p.id===id);
-        return {id,name:player?.name||'Joueur inconnu'};
+        const p=findPerson(id);return {id,name:p?.name||'Participant inconnu'};
       }));
       state.history=pruneHistory([{week,teams:records},...state.history.filter(h=>h.week!==week)]);
-      save();renderHistory();toast('Composition de cette semaine enregistrée.');
+      save();renderHistory();toast('Composition de cette semaine enregistree.');
     }
-    function renderTournament() {
-      const active=state.tournamentMode;
-      el('tournamentToggle').checked=active;
-      el('tournamentControls').hidden=!active;
-      if(!active)return;
-      el('tournamentTeam').innerHTML=Array.from({length:state.teamCount},(_,i)=>`<option value="${i}">${teamName(i)}</option>`).join('');
-      el('tournamentTeam').value=String(state.lockedTeam);
-      state.lockedIds=state.lockedIds.filter(id=>availablePlayers().some(p=>p.id===id));
-      const selected=new Set(state.lockedIds),roster=sortedPlayers(availablePlayers()).filter(p=>normalize(p.name).includes(normalize(el('tournamentSearch').value)));
-      el('tournamentRoster').innerHTML=roster.length?roster.map(p=>`<label class="tournament-pick"><input type="checkbox" data-pin="${escapeHtml(p.id)}" ${selected.has(p.id)?'checked':''}><span>${escapeHtml(p.name)}</span><small>${p.sex==='F'?'Femme':'Homme'} · ${totalLabel(playerAverage(p).toFixed(1))}/4</small></label>`).join(''):'<div class="history-empty">Aucun joueur disponible trouvé.</div>';
-      const women=availablePlayers().filter(p=>p.sex==='F').length,low=Math.floor(women/state.teamCount),higher=Math.ceil(women/state.teamCount);
-      const fixedWomen=state.lockedIds.filter(id=>state.players.find(p=>p.id===id)?.sex==='F').length;
-      el('pinnedCount').textContent=state.lockedIds.length;
-      el('tournamentHint').textContent=`${state.lockedIds.length} joueur(s) fixé(s), dont ${fixedWomen} femme(s). Pour respecter la règle, chaque équipe doit contenir ${low}${higher!==low?' ou '+higher:''} femme(s).`;
+    function renderTournament(){
+      el('tournamentToggle').checked=state.tournamentMode;
+      el('tournamentControls').hidden=!state.tournamentMode;
+      if(!state.tournamentMode)return;
+      const roster=sortedPlayers(participants()).filter(p=>normalize(p.name).includes(normalize(el('tournamentSearch').value)));
+      const current=new Set(participants().map(p=>p.id));
+      state.tournamentLocks.forEach(l=>{l.ids=l.ids.filter(id=>current.has(id))});
+      el('tournamentLocksContainer').innerHTML=state.tournamentLocks.map((lock,index)=>{
+        const name=teamName(index),shade=index===0?'red':'yellow';
+        const rosterRows=roster.map(p=>{
+          const otherIndex=1-index,otherLock=state.tournamentLocks[otherIndex];
+          const taken=otherLock.enabled&&otherLock.ids.includes(p.id),forbidden=lock.noWomen&&p.sex==='F';
+          const disabled=!lock.enabled||taken||forbidden;
+          const note=taken?'Dans '+teamName(otherIndex):(forbidden?'Non eligible (femme)':p.guest?'Invite':(p.sex==='F'?'Femme':'Homme'));
+          return `<label class="tournament-pick" aria-disabled="${disabled}"><input type="checkbox" data-pin="${escapeHtml(p.id)}" data-lock-index="${index}" ${lock.ids.includes(p.id)?'checked':''} ${disabled?'disabled':''}><span>${escapeHtml(p.name)}${p.guest?' <span class="guest-mark">INVITÉ</span>':''}</span><small>${escapeHtml(note)}</small></label>`;
+        }).join('');
+        return `<section class="tournament-lock ${lock.enabled?'':'is-off'}"><div class="tournament-lock-head ${shade}"><div><strong>${name}</strong><small>${lock.ids.length} personne${lock.ids.length>1?'s':''} fixee${lock.ids.length>1?'s':''}</small></div><label class="compact-check"><input type="checkbox" data-tourney-enable="${index}" ${lock.enabled?'checked':''}> Activer</label></div>${lock.enabled?`<div class="tournament-lock-body"><label class="compact-check"><input type="checkbox" data-no-women="${index}" ${lock.noWomen?'checked':''}> Sans femmes dans cette equipe</label><div class="tournament-roster">${rosterRows||'<div class="guest-empty">Aucune personne disponible.</div>'}</div></div>`:''}</section>`;
+      }).join('');
+      const count=state.tournamentLocks.filter(l=>l.enabled).length;
+      const guests=state.guests.length;
+      el('tournamentHint').textContent=`${count} equipe(s) tournoi fixe(s). ${guests} invite(s) ponctuel(s). Les femmes non sélectionnées seront réparties entre les équipes restantes, selon leurs capacites. Si les deux equipes tournoi sont les seules equipes, tous les participants doivent y etre selectionnes.`;
     }
     function renderHistory() {
       state.history=pruneHistory(state.history);
@@ -1240,16 +1376,16 @@
     }
     function exportTeamCSV(){
       if(!state.lastTeams)return;
-      const header=['Équipe','Nom','Sexe',...state.criteria.map(c=>c.name),'Note pondérée'];
+      const header=['Équipe','Nom','Type','Sexe',...state.criteria.map(c=>c.name),'Note pondérée'];
       const data=state.lastTeams.flatMap((team,i)=>team.map(id=>{
-        const p=state.players.find(j=>j.id===id);
-        return p?[`${teamName(i)}`,p.name,p.sex==='F'?'Femme':'Homme',...state.criteria.map(c=>p.ratings[c.id]||3),playerAverage(p).toFixed(2).replace('.',',')]:null;
+        const p=findPerson(id);
+        return p?[`${teamName(i)}`,p.name,p.guest?'Invité':'Joueur',p.sex==='F'?'Femme':'Homme',...state.criteria.map(c=>p.ratings[c.id]||3),playerAverage(p).toFixed(2).replace('.',',')]:null;
       }).filter(Boolean));
       download('rugby-equipes.csv','\ufeff'+[header,...data].map(r=>r.map(quoteCSV).join(';')).join('\r\n'),'text/csv;charset=utf-8');toast('Équipes exportées.');
     }
     async function exportTeamsPNG(){
       if(!state.lastTeams?.length){toast('Générez d’abord vos équipes.',true);return;}
-      const rows=state.lastTeams.map((ids,i)=>({i,players:sortedPlayers(ids.map(id=>state.players.find(p=>p.id===id)).filter(Boolean))}));
+      const rows=state.lastTeams.map((ids,i)=>({i,players:sortedPlayers(ids.map(id=>findPerson(id)).filter(Boolean))}));
       // Export portrait : une seule colonne, chaque equipe sous la precedente.
       const cols=1,cellW=536,gap=20,pad=32,top=156;
       const width=pad*2+cols*cellW+(cols-1)*gap;
@@ -1380,14 +1516,45 @@
     }
 
     el('tournamentToggle').addEventListener('change',e=>{state.tournamentMode=e.target.checked;changeState()});
-    el('tournamentTeam').addEventListener('change',e=>{state.lockedTeam=Number(e.target.value);changeState()});
-    el('tournamentSearch').addEventListener('input',()=>renderTournament());
-    el('tournamentRoster').addEventListener('change',e=>{
-      if(!e.target.matches('[data-pin]'))return;
-      const id=e.target.dataset.pin;
-      if(e.target.checked&&!state.lockedIds.includes(id))state.lockedIds.push(id);
-      if(!e.target.checked)state.lockedIds=state.lockedIds.filter(x=>x!==id);
-      changeState();
+    el('tournamentSearch').addEventListener('input',renderTournament);
+    el('tournamentLocksContainer').addEventListener('change',e=>{
+      const target=e.target;
+      if(target.matches('[data-tourney-enable]')){
+        const index=Number(target.dataset.tourneyEnable);state.tournamentLocks[index].enabled=target.checked;
+        if(target.checked){
+          const other=state.tournamentLocks[1-index];
+          other.ids=other.ids.filter(id=>!state.tournamentLocks[index].ids.includes(id));
+        }
+        changeState();return;
+      }
+      if(target.matches('[data-no-women]')){
+        const index=Number(target.dataset.noWomen),lock=state.tournamentLocks[index];
+        lock.noWomen=target.checked;
+        if(lock.noWomen){const before=lock.ids.length;lock.ids=lock.ids.filter(id=>findPerson(id)?.sex!=='F');if(lock.ids.length!==before)toast('Les femmes ont été retirées de cette sélection tournoi.');}
+        changeState();return;
+      }
+      if(target.matches('[data-pin]')){
+        const index=Number(target.dataset.lockIndex),id=target.dataset.pin,lock=state.tournamentLocks[index];
+        if(target.checked){
+          if(state.tournamentLocks.some((l,i)=>i!==index&&l.enabled&&l.ids.includes(id))){toast('Personne deja dans une autre equipe tournoi.',true);renderTournament();return}
+          if(lock.noWomen&&findPerson(id)?.sex==='F'){toast('Cette equipe est sans femmes.',true);renderTournament();return}
+          if(!lock.ids.includes(id))lock.ids.push(id);
+        }else lock.ids=lock.ids.filter(x=>x!==id);
+        changeState();
+      }
+    });
+    el('addGuest').addEventListener('click',()=>openPlayer(null,true));
+    el('guestRoster').addEventListener('click',e=>{
+      const edit=e.target.closest('[data-guest-edit]'),del=e.target.closest('[data-guest-delete]');
+      if(edit){openPlayer(edit.dataset.guestEdit,true);return}
+      if(del){const g=findPerson(del.dataset.guestDelete);if(!g||!g.guest)return;
+        if(!confirm('Retirer '+g.name+' des invités ponctuels ?'))return;
+        state.guests=state.guests.filter(p=>p.id!==g.id);dropFromTournament(g.id);changeState();toast('Invite retire.');}
+    });
+    el('clearGuests').addEventListener('click',()=>{
+      if(!state.guests.length)return;
+      if(!confirm("Supprimer tous les invités ponctuels ? Les joueurs habituels et l'historique resteront inchanges."))return;
+      state.guests.forEach(g=>dropFromTournament(g.id));state.guests=[];changeState();toast('Invites ponctuels vides.');
     });
     el('historyContent').addEventListener('click',e=>{
       const button=e.target.closest('[data-delete-week]');if(!button)return;
@@ -1416,9 +1583,9 @@
       if(button.dataset.action==='demo'){demoRoster();return}
       const player=state.players.find(p=>p.id===button.dataset.id);if(!player)return;
       if(button.dataset.action==='edit')openPlayer(player.id);
-      if(button.dataset.action==='toggle'){player.available=!player.available;if(!player.available)state.lockedIds=state.lockedIds.filter(id=>id!==player.id);changeState();toast(player.name+(player.available?' est disponible.':' est indisponible.'));}
+      if(button.dataset.action==='toggle'){player.available=!player.available;if(!player.available)dropFromTournament(player.id);changeState();toast(player.name+(player.available?' est disponible.':' est indisponible.'));}
       if(button.dataset.action==='delete'&&confirm(`Supprimer ${player.name} de l’effectif ?`)){
-        state.players=state.players.filter(p=>p.id!==player.id);state.lockedIds=state.lockedIds.filter(id=>id!==player.id);changeState();toast('Joueur supprimé.');
+        state.players=state.players.filter(p=>p.id!==player.id);dropFromTournament(player.id);changeState();toast('Joueur supprimé.');
       }
     });
     el('addCriterionForm').addEventListener('submit',addCriterion);
@@ -1445,11 +1612,11 @@
         if(state.criteria.length<=1){toast('Gardez au moins un critère.',true);return}
         if(!confirm(`Supprimer le critère « ${c.name} » et ses notes ?`))return;
         state.criteria=state.criteria.filter(x=>x.id!==c.id);
-        state.players.forEach(p=>delete p.ratings[c.id]);changeState();toast('Critère supprimé.');
+        [...state.players,...state.guests].forEach(p=>delete p.ratings[c.id]);changeState();toast('Critère supprimé.');
       }
     });
     el('addTeam').addEventListener('click',()=>{state.teamCount=clamp(state.teamCount+1,2,12);changeState()});
-    el('removeTeam').addEventListener('click',()=>{state.teamCount=clamp(state.teamCount-1,2,12);state.lockedTeam=Math.min(state.lockedTeam,state.teamCount-1);changeState()});
+    el('removeTeam').addEventListener('click',()=>{state.teamCount=clamp(state.teamCount-1,2,12);changeState()});
     el('generateHero').addEventListener('click',generate);
     el('loadDemoHero').addEventListener('click',demoRoster);
     el('resultButtons').addEventListener('click',e=>{
@@ -1462,9 +1629,14 @@
         if(!swapUndo)return;
         state.lastTeams=swapUndo.teams.map(t=>t.slice());
         state.runMeta={...swapUndo.meta};
-        swapUndo=null;selectedSwap=null;changeState(false);
-        toast('Dernier échange annulé.');
+        state.tournamentLocks=structuredClone(swapUndo.locks);swapUndo=null;selectedSwap=null;changeState(false);
+        toast('Derniere modification annulee.');
       }else if(b.dataset.result==='csv')exportTeamCSV();else if(b.dataset.result==='png')exportTeamsPNG();else if(b.dataset.result==='again')generate();else if(b.dataset.result==='save-week')saveWeek();
+    });
+    el('resultsContent').addEventListener('change',e=>{
+      if(e.target.id==='manualFreeWomen'){state.manualFreeWomen=e.target.checked;save();renderResults();return;}
+      const move=e.target.closest('[data-move-id]');
+      if(move&&move.value!==''){movePerson(move.dataset.moveId,Number(move.value));}
     });
     el('resultsContent').addEventListener('click',e=>{
       const button=e.target.closest('[data-swap-id]');
@@ -1478,11 +1650,11 @@
     el('clearPlayers').addEventListener('click',()=>{
       if(!state.players.length){toast('Votre effectif est déjà vide.');return}
       if(!confirm('Supprimer tous les joueurs et les équipes générées ?'))return;
-      state.players=[];state.lockedIds=[];currentSearch='';el('playerSearch').value='';changeState();toast('Effectif vidé.');
+      state.players=[];state.tournamentLocks.forEach(lock=>{lock.ids=lock.ids.filter(id=>state.guests.some(g=>g.id===id))});currentSearch='';el('playerSearch').value='';changeState();toast('Effectif vidé.');
     });
     el('exportPlayers').addEventListener('click',exportPlayerCSV);
     el('exportBackup').addEventListener('click',()=>{
-      download('rugby-sauvegarde.json',JSON.stringify(state,null,2),'application/json;charset=utf-8');toast('Sauvegarde JSON téléchargée.');
+      download('USMV-V1-1-sauvegarde.json',JSON.stringify(state,null,2),'application/json;charset=utf-8');toast('Sauvegarde JSON téléchargée.');
     });
     el('importButton').addEventListener('click',()=>el('importFile').click());
     el('importFile').addEventListener('change',handleImport);
